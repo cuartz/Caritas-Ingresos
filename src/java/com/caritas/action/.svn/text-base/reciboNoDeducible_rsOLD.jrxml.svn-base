@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reciboNoDeducible_rs" printOrder="Horizontal" pageWidth="612" pageHeight="353" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.3310000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ID_BITACORA" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID_RECIBO" class="java.lang.Integer"/>
+	<parameter name="NOMBRE_DONANTE" class="java.lang.String"/>
+	<parameter name="DOMICILIO" class="java.lang.String"/>
+	<parameter name="RAZON_SOCIAL" class="java.lang.Integer"/>
+	<parameter name="ZONA" class="java.lang.Integer"/>
+	<parameter name="TEL_CASA" class="java.lang.Integer"/>
+	<parameter name="TEL_OFICINA" class="java.lang.Integer"/>
+	<parameter name="ENTRE_CALLES" class="java.lang.String"/>
+	<parameter name="LETRA" class="java.lang.String"/>
+	<parameter name="ID_ASIGNACION" class="java.lang.Integer"/>
+	<parameter name="ID_CAMPANA_FINANCIERA" class="java.lang.Integer"/>
+	<parameter name="ID_FRECUENCIA" class="java.lang.Integer"/>
+	<parameter name="ID_NUM_PAGO" class="java.lang.Integer"/>
+	<parameter name="ID_DONANTE" class="java.lang.Integer"/>
+	<parameter name="ID_DONATIVO" class="java.lang.Integer"/>
+	<parameter name="ID_FORMA_PAGO" class="java.lang.String"/>
+	<parameter name="FECHA_ACTUAL" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="ID_BITACORA" class="java.math.BigDecimal"/>
+	<field name="ID_RECIBO" class="java.lang.String"/>
+	<field name="NOMBRE_DONANTE" class="java.lang.String"/>
+	<field name="RAZON_SOCIAL" class="java.lang.String"/>
+	<field name="TEL_CASA" class="java.math.BigDecimal"/>
+	<field name="TEL_OFICINA" class="java.math.BigDecimal"/>
+	<field name="LETRA" class="java.lang.String"/>
+	<field name="ID_TIPO_DIRECCION" class="java.lang.String"/>
+	<field name="Domicilio" class="java.lang.String"/>
+	<field name="ENTRE_CALLES" class="java.lang.String"/>
+	<field name="ESTATUS_PAGO_TMP" class="java.lang.String"/>
+	<field name="ID_FORMA_PAGO" class="java.lang.String"/>
+	<field name="ID_CAMPANA_FINANCIERA" class="java.lang.String"/>
+	<field name="NUM_FRECUENCIA" class="java.math.BigDecimal"/>
+	<field name="ID_ASIGNACION" class="java.lang.String"/>
+	<field name="NUM_CASO" class="java.math.BigDecimal"/>
+	<field name="ID_ZONA" class="java.lang.String"/>
+	<field name="ID_TIPO_DONATIVO" class="java.lang.String"/>
+	<field name="ID_DONANTE" class="java.math.BigDecimal"/>
+	<field name="ID_NUM_PAGO" class="java.math.BigDecimal"/>
+	<field name="ID_USUARIO" class="java.lang.String"/>
+	<field name="Fecha_Actual" class="java.lang.String"/>
+	<field name="ID_DONATIVO" class="java.math.BigDecimal"/>
+	<variable name="APOYO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="DONATIVO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="179" y="6" width="207" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CÁRITAS DE MONTERREY A.B.P.
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="20" width="324" height="20"/>
+				<textElement textAlignment="Justified">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Francisco G. Sada 2810 Pte. Col. Deportivo Obispado C.P. 64040
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="31" width="324" height="20"/>
+				<textElement textAlignment="Justified">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[Tel. 1340-2060 y 70 Monterrey, N.L., México RFC. CMO-820811-NX9
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="462" y="19" width="110" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="442" y="8" width="20" height="19"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[No.
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="0" width="570" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="440" y="41" width="122" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Recibo de Pago
+                ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="473" y="7" width="93" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_RECIBO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="250">
+			<staticText>
+				<reportElement x="14" y="18" width="80" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Recibimos de:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="12" y="42" width="56" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Domicilio:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="12" y="63" width="56" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Tel. Casa:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="123" y="62" width="56" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Tel. Oficina:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="80" y="30" width="482" height="1"/>
+			</line>
+			<line>
+				<reportElement x="68" y="55" width="494" height="1"/>
+			</line>
+			<line>
+				<reportElement x="68" y="74" width="52" height="1"/>
+			</line>
+			<line>
+				<reportElement x="179" y="75" width="60" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="12" y="81" width="56" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Cantidad:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="68" y="95" width="494" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="103" width="55" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Asignación:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="101" width="100" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Campaña Financiera:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="123" width="54" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Frecuencia:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="137" y="122" width="78" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Núm. Aportación:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="293" y="121" width="65" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<text><![CDATA[No. Donante:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="122" width="62" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[No. Donativo:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="215" y="134" width="78" height="1"/>
+			</line>
+			<line>
+				<reportElement x="358" y="132" width="82" height="1"/>
+			</line>
+			<line>
+				<reportElement x="88" y="135" width="49" height="1"/>
+			</line>
+			<line>
+				<reportElement x="504" y="133" width="58" height="1"/>
+			</line>
+			<line>
+				<reportElement x="69" y="114" width="166" height="1"/>
+			</line>
+			<line>
+				<reportElement x="339" y="114" width="223" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="172" width="530" height="17"/>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[Para Obtener su recibo deducible de impuestos ingresar a www.caritas.org.mx o llamar al 13402060 y 70 proporcione su
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="14" y="183" width="530" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[correo electrónico y se lo enviaremos. Es indispensable solicitarlo dentro de los dos meses siguentes en que otorgó su donativo.
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="217" width="69" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Monterrey N.L.
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="457" y="229" width="105" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="239" y="61" width="88" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[ENTRE CALLES:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="321" y="74" width="241" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="513" y="43" width="28" height="20"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Zona:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="-63" width="1" height="312"/>
+			</line>
+			<line>
+				<reportElement x="571" y="-63" width="1" height="313"/>
+			</line>
+			<line>
+				<reportElement x="0" y="249" width="572" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="104" y="18" width="311" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{NOMBRE_DONANTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="473" y="18" width="89" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{RAZON_SOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="42" width="427" height="19"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{DOMICILIO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="541" y="42" width="21" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ZONA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="63" width="52" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{TEL_CASA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="179" y="62" width="60" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{TEL_OFICINA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="373" y="61" width="189" height="34"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ENTRE_CALLES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="69" y="82" width="493" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{LETRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="87" y="103" width="148" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_ASIGNACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="373" y="102" width="189" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_CAMPANA_FINANCIERA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="122" width="49" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_FRECUENCIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="215" y="122" width="78" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_NUM_PAGO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="358" y="121" width="82" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_DONANTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="121" width="62" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ID_DONATIVO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="293" y="142" width="179" height="30"/>
+				<textElement>
+					<font size="13"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ID_FORMA_PAGO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="462" y="217" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{FECHA_ACTUAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

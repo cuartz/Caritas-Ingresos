@@ -1,0 +1,13 @@
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+
+#CATALOGOS
+
+catalogo.identificados = SELECT * FROM TEST WHERE ID=?
+
+
+
+#PANTALLA REGISTROS DE AYUDA#############################################
+ayuda.getAllHelpRegister=SELECT * FROM OPE_Ayudas_Servicios
+
+#########################################################################

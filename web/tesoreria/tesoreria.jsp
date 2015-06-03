@@ -1,0 +1,632 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page language="java" %>
+<%@page import="org.apache.struts.Globals" %>
+<%@page import="java.util.Locale" %>
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%
+    HttpSession sesion = request.getSession();
+    String idusersession = "";
+    try {
+        if (sesion.getAttribute("idusersession") != null) {
+            idusersession = sesion.getAttribute("idusersession").toString();
+        }
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+%>
+<html>
+    <head>       
+        <script type="text/javascript">
+        /******************** VARIABLES GLOBALES ***********************/
+        var idUsuarioTmp    = '<%=idusersession%>';
+        var idUsuarioSplit  = idUsuarioTmp.split(":");
+        var idUsuario       = idUsuarioSplit[0];
+        var winTesoreria;        
+        
+        /******************** FUNCIONES ***********************/
+        function render_money(v, p, record){
+                return '$ '+v+'.00'
+            }
+        
+        /******************** MODELS ***********************/
+        Ext.define('pagosEfectivoConfirmadosMdl',{ 
+            id:'pagosEfectivoConfirmadosMdl',
+            extend: 'Ext.data.Model',
+            fields:[
+                {name: 'ID_BITACORA'},                
+                {name: 'ID_DONATIVO'},
+                {name: 'NOMBRE'},               
+                {name: 'NUM_PAGO'},
+                {name: 'IMPORTE'},
+                {name: 'ID_FORMA_PAGO'},
+                {name: 'FORMA_PAGO'},
+                {name: 'DIRECCION'},
+                {name: 'ID_ESTATUS_PAGO_TMP'},                
+                {name: 'FECHA_VISITA'},
+                {name: 'ID_TIPO_DONATIVO'},
+                {name: 'REFERENCIA'},
+                {name: 'COMENTARIOS'},
+                {name: 'ID_RECIBO'},
+                {name: 'FECHA_COBRO'},
+                {name: 'ESTATUS_PAGO'},                
+                {name: 'FECHA_PAGO'}, 
+                {name: 'FECHA_IMPRESION'},
+            ]
+        });
+        
+        Ext.define('contabilidadMdl',{ 
+            id:'contabilidadMdl',
+            extend: 'Ext.data.Model',
+            fields:[
+                {name: 'NUM'},
+                {name: 'ID_RECIBO'},
+                {name: 'PROYECTO'},
+                {name: 'NUM_FRECUENCIA'},               
+                {name: 'FECHA_VENCIMIENTO'},
+                {name: 'FECHA_PAGO'},
+                {name: 'IMPORTE'},
+                {name: 'FORMA_PAGO'},
+                {name: 'CUENTA'},
+                {name: 'ASIGNACION'},
+                {name: 'RECOLECTOR'},
+                {name: 'ID_BITACORA'}                
+            ]
+        });
+        
+        Ext.define('pagosConfirmados',{  
+            id:'pagosConfirmados',
+            extend: 'Ext.data.Model',
+            fields:[
+                {name: 'ID_BITACORA'},
+                {name: 'ID_DONATIVO'},                        
+                {name: 'NOMBRE'},
+                {name: 'NUM_PAGO'},
+                {name: 'IMPORTE'},
+                {name: 'ID_FORMA_PAGO'},
+                {name: 'FORMA_PAGO'},
+                {name: 'DIRECCION'},
+                {name: 'ID_ESTATUS_PAGO_TMP'},
+                {name: 'ESTATUS_PAGO'}
+            ]
+        });
+        
+        Ext.define('recolectoresIngresos',{// create the Data TIPO DE DIRECCION
+            id:'recolectores',
+            extend: 'Ext.data.Model',
+            fields: ['id','nombre','idZona','idTipoRecolector']
+        });
+        
+        Ext.define('catalog',{
+            id:'catalog',
+            extend: 'Ext.data.Model',
+            fields: ['id','id_catalog','nombre','status']
+        });
+        
+        /******************** STORES ***********************/        
+        var stateszonasPC = Ext.create('Ext.data.JsonStore', {
+            model: 'catalog',
+            proxy: {
+                type: 'ajax',
+                url: 'comboboxAC.do?method=getCatalogByLlave',
+                extraParams:{llave:'INGRESOS_ZONAS'},
+                reader: {
+                    type: 'json',
+                    root: 'rows'
+                }
+            }
+        });
+        
+        var storeRecolectoresAdmon = Ext.create('Ext.data.JsonStore', {
+            model: 'recolectoresIngresos',
+            proxy: {
+                type: 'ajax',
+                url: 'comboboxAC.do?method=getAllRecolectores',                      
+                reader: {
+                    type: 'json',
+                    root: 'rows'
+                }
+            }
+        });
+        
+        /******************** INICIA PANTALLA ***********************/
+        Ext.define('tesoreria.tesoreria', {                    
+            extend: 'Ext.window.Window',                    
+            alias:'widget.tesoreria',                
+            title: 'Administración - Cobros y Recibos',
+            width: 900,  
+            constrain : true,
+            height: 620,
+            border: false,
+            buttonAlign: 'left',
+            maximizable: true,
+            layout: 'fit',
+            modal : true,
+            closeAction : 'destroy',
+            region:'center',
+                initComponent: function() {
+                    /******************** INICIALIZAR VALORES ***********************/
+                    winTesoreria = this;                 
+                    
+                    /******************** STORE PARA GRIDS ***********************/
+                    var storeContabilidad = Ext.create('Ext.data.JsonStore', {                   
+                        model: 'contabilidadMdl',
+                        pageSize: 50,
+                        autoLoad:false,
+                        proxy: {
+                            type: 'ajax',                       
+                            url: 'tesoreriaAC.do?method=getReporteDiario',                                     
+                            reader: {
+                                type: 'json',
+                                root: 'rows',
+                                totalProperty:'totalcount'//Paginacion                
+                            }
+                        }
+                    });
+                    
+                    var storeContabilidadEspecie = Ext.create('Ext.data.JsonStore', {                   
+                        model: 'contabilidadMdl',
+                        pageSize: 50,
+                        autoLoad:false,
+                        proxy: {
+                            type: 'ajax',                       
+                            url: 'tesoreriaAC.do?method=getReporteDiarioEspecie',                                     
+                            reader: {
+                                type: 'json',
+                                root: 'rows',
+                                totalProperty:'totalcount'//Paginacion                
+                            }
+                        }
+                    });
+                    
+                    var storeGridCobrosEfectivo = Ext.create('Ext.data.JsonStore', {                   
+                        model: 'pagosEfectivoConfirmadosMdl',
+                        pageSize: 50,
+                        autoLoad:false,
+                        proxy: {
+                            type: 'ajax',                       
+                            url: 'tesoreriaAC.do?method=getAllCobrosEfectivo',                                     
+                            reader: {
+                                type: 'json',
+                                root: 'rows',
+                                totalProperty:'totalcount'//Paginacion                
+                            }
+                        }
+                    });  
+                    
+                    /******************** TOOLBAR ***********************/
+                    var tbUno = new Ext.Toolbar({
+                        items:[                      
+                            new Ext.Button({
+                                text:'Buscar',
+                                iconCls: 'icon-find',
+                                handler:function(){                                                        
+                                    ID_RECOLECTOR_TMP = Ext.getCmp('ID_RECOLECTOR').getValue();
+                                    FECHA_VISITA_TMP = Ext.getCmp('FECHA_VISITA').getValue();
+                                    ID_ZONA_TMP = Ext.getCmp('ID_ZONA').getValue();
+                                    var NUM_RECIBO_TESORERIA_EFECTIVO_TMP = Ext.getCmp('NUM_RECIBO_TESORERIA_EFECTIVO').getValue();
+                                    var NOMBRE_DONANTE_TESORERIA_EFECTIVO_TMP = Ext.getCmp('NOMBRE_DONANTE_TESORERIA_EFECTIVO').getValue();                                    
+                                    if(FECHA_VISITA_TMP == null) FECHA_VISITA_TMP = null;
+                                    if(ID_RECOLECTOR_TMP == null) ID_RECOLECTOR_TMP = 0;
+                                    if(ID_ZONA_TMP == null) ID_ZONA_TMP = 0;                                                        
+                                    storeGridCobrosEfectivo.proxy.extraParams = {
+                                        ID_RECOLECTOR:ID_RECOLECTOR_TMP,
+                                        FECHA_VISITA:FECHA_VISITA_TMP,
+                                        ID_ZONA:ID_ZONA_TMP,
+                                        ID_RECIBO:NUM_RECIBO_TESORERIA_EFECTIVO_TMP,
+                                        NOMBRE_DONANTE:NOMBRE_DONANTE_TESORERIA_EFECTIVO_TMP
+                                    };
+                                    storeGridCobrosEfectivo.load(); 
+                                }
+                            }),
+                            '-',
+                            Ext.create('Ext.Button',{
+                                text:'Limpiar Filtros',
+                                iconCls:'icon-clear',
+                                handler: function(){                                                                                                                   
+                                    Ext.getCmp('frmCobrosEfectivo').getForm().reset();
+                                    ID_RECOLECTOR_TMP = Ext.getCmp('ID_RECOLECTOR').getValue();
+                                    FECHA_VISITA_TMP = Ext.getCmp('FECHA_VISITA').getValue();
+                                    if(FECHA_VISITA_TMP == null) FECHA_VISITA_TMP = null;
+                                    if(ID_RECOLECTOR_TMP == null) ID_RECOLECTOR_TMP = 0;                                                       
+                                    storeGridCobrosEfectivo.proxy.extraParams = {ID_RECOLECTOR:ID_RECOLECTOR_TMP,FECHA_VISITA:FECHA_VISITA_TMP};
+                                    storeGridCobrosEfectivo.load();
+                                }
+                            }),
+                            '-', 
+                            {
+                                xtype: 'button',
+                                text: 'Bitacora de Pagos',
+                                iconCls: 'icon-registro',
+                                handler: function(){
+                                    var selectedRow = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items[0];
+                                    if(selectedRow!=undefined){                                       
+                                        createNewObj2('donantes.bitacoraPagos',selectedRow.data.ID_DONATIVO);                                                                  
+                                    }else{
+                                        Ext.MessageBox.alert('Error','¡Seleccione el pago que desea consultar!');
+                                    }
+                                }
+                            },
+                            new Ext.Button({
+                                text:'Confirmar Cobro',
+                                iconCls: 'icon-money',
+                                handler: function(){
+                                    if(idUsuario == 'AGARZA' || idUsuario == 'RNUNEZ'){
+                                        var selectedRow = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items[0];
+                                        if(selectedRow!=undefined){
+                                            if(selectedRow.data.FECHA_IMPRESION != 'N/A'){ //Si esta impreso
+                                                if(selectedRow.data.ID_ESTATUS_PAGO_TMP != 2777){ //Si no esta pagado
+                                                    createNewObj2('tesoreria.tesoreriaConfirmacionCobro',selectedRow.data.ID_BITACORA);
+                                                }else{                                                    
+                                                    Ext.Msg.confirm('ALERTA', '¡Este recibo ya cuenta con status PAGADO! ¿desea CONTINUAR?', function(btn, text){
+                                                        if (btn == 'yes'){
+                                                            createNewObj2('tesoreria.tesoreriaConfirmacionCobro',selectedRow.data.ID_BITACORA);
+                                                        }
+                                                    })
+                                                }
+                                            }else{
+                                                Ext.MessageBox.alert('Error','¡El recibo no esta impreso!');
+                                            }
+                                        }else{
+                                            Ext.MessageBox.alert('Error','¡Seleccione el pago que desea confirmar!');
+                                        }
+                                    }else{
+                                        Ext.MessageBox.alert('Error','¡Usted no tiene permisos para ejecutar esta acción!');
+                                    }                                    
+                                }
+                            }),
+                            '-', 
+                            new Ext.Button({
+                                text:'Generar Factura',
+                                iconCls: 'icon-expediente',
+//                                handler: function(){
+//                                    var selectedRow = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items[0];
+//                                    if(selectedRow!=undefined){                                       
+//                                        Ext.Ajax.request({  
+//                                            url : 'tesoreriaAC.do?method=generarArchivoAdminPack' ,
+//                                            params : { 
+//                                                ID_BITACORA:selectedRow.data.ID_BITACORA
+//                                            },
+//                                            method: 'GET',
+//                                            success: function ( result, request ) {
+//                                                Ext.MessageBox.alert('Eliminar','¡La factura se ha creado correctamente!');                                                
+//                                            },
+//                                            failure: function ( result, request) {
+//                                                Ext.MessageBox.alert('Error','¡Ocurrio un error al generar la factura!');                                                
+//                                            }
+//                                        });                                                                  
+//                                    }else{
+//                                        Ext.MessageBox.alert('Error','¡Seleccione un recibo para generar su factura!');
+//                                    }
+//                                }
+                                
+                                handler: function() {                                
+                                    var selectedRow         = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items[0];
+                                    var sizeSelected        = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items.length;
+                                    var idBitacoraTmp       = 0;
+                                    var result              = "";
+                                    if(selectedRow != undefined){
+                                        for(z = 0; z < sizeSelected; z = z+1){                                        
+                                            selectedRow = Ext.getCmp('gridCobrosEfectivo').selModel.selected.items[z];
+                                            idBitacoraTmp = selectedRow.data.ID_BITACORA;                                                                                        
+                                            result += idBitacoraTmp + ",";                                                                                 
+                                        }
+                                        Ext.Ajax.request({  
+                                            url : 'tesoreriaAC.do?method=generarArchivoAdminPack' ,
+                                            params : { 
+                                                bitacoras:result
+                                            },
+                                            method: 'GET',
+                                            success: function ( result, request ) {
+                                                Ext.MessageBox.alert('Correcto','¡El archivo para AdminPaq se ha creado correctamente!');                                                
+                                            },
+                                            failure: function ( result, request) {
+                                                Ext.MessageBox.alert('Error','¡Ocurrio un error al generar las facturas!');                                                
+                                            }
+                                        });
+                                    }else{
+                                        Ext.MessageBox.alert('Error','¡Favor de seleccionar uno o varios recibos!');
+                                    }
+                                    //alert("result: "+result);
+                                }
+                            }),
+                            '-', 
+                            new Ext.Button({
+                                text: 'Salir',
+                                iconCls:'icon-salir',
+                                handler: function(){
+                                    winTesoreria.close();                            
+                                }
+                            })                            
+                        ]
+                    }); //Termina Toolbar
+                    
+                    var tbContabilidad = new Ext.Toolbar({
+                        items:[
+                            new Ext.Button({
+                                text:'Buscar',
+                                iconCls: 'icon-find',
+                                handler:function(){                                    
+                                    var FECHA_PAGO_CONTABILIDAD = Ext.getCmp('FECHA_PAGO_CONTABILIDAD').getValue();
+                                    storeContabilidad.proxy.extraParams = {
+                                        FECHA_PAGO:FECHA_PAGO_CONTABILIDAD                                        
+                                    };
+                                    storeContabilidad.load();
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Limpiar Filtros',
+                                iconCls: 'icon-clear',
+                                handler:function(){                                    
+                                    Ext.getCmp('frmContabilidadUno').getForm().reset();
+                                    storeContabilidad.proxy.extraParams = {
+                                        FECHA_PAGO:null                                        
+                                    };
+                                    storeContabilidad.load();
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Modificar Fecha de Pago',
+                                iconCls: 'icon-editar',
+                                handler:function(){                                    
+                                    var selectedRow = Ext.getCmp('gridContabilidad').selModel.selected.items[0];                                    
+                                    if(selectedRow!=undefined){                                                                               
+                                      createNewObj3('tesoreria.modificarReciboPagado',selectedRow.data.ID_BITACORA,selectedRow.data.ID_RECIBO);                                                                    
+                                    }else{
+                                        Ext.MessageBox.alert('Error','¡Seleccione el recibo que va a modificar!');
+                                    }
+                                    
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Exportar Reporte',
+                                iconCls:'icon-xlsx',
+                                handler:function(){                                    
+                                    var FECHA_PAGO_CONTABILIDAD = Ext.getCmp('FECHA_PAGO_CONTABILIDAD').getValue();
+                                    if(FECHA_PAGO_CONTABILIDAD == null){
+                                        Ext.MessageBox.alert('Error','¡Seleccione una fecha de pago!');
+                                    }else{
+                                        window.open("ShowExcel?idOperationType=15&fechaPago="+FECHA_PAGO_CONTABILIDAD);
+                                    }
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text: 'Salir',
+                                iconCls:'icon-salir',
+                                handler: function(){
+                                    winTesoreria.close();                            
+                                }
+                            })                            
+                        ]
+                    }); //Termina Toolbar
+                    
+                    var tbContabilidadDos = new Ext.Toolbar({
+                        items:[
+                            new Ext.Button({
+                                text:'Buscar',
+                                iconCls: 'icon-find',
+                                handler:function(){                                    
+                                    var FECHA_PAGO_CONTABILIDAD = Ext.getCmp('FECHA_PAGO_CONTABILIDAD_DOS').getValue();
+                                    storeContabilidadEspecie.proxy.extraParams = {
+                                        FECHA_PAGO:FECHA_PAGO_CONTABILIDAD                                        
+                                    };
+                                    storeContabilidadEspecie.load();
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Limpiar Filtros',
+                                iconCls: 'icon-clear',
+                                handler:function(){                                    
+                                    Ext.getCmp('frmContabilidadDos').getForm().reset();
+                                    storeContabilidadEspecie.proxy.extraParams = {
+                                        FECHA_PAGO:null                                        
+                                    };
+                                    storeContabilidadEspecie.load();
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Modificar Fecha de Pago',
+                                iconCls: 'icon-editar',
+                                handler:function(){                                    
+                                    var selectedRow = Ext.getCmp('gridContabilidad').selModel.selected.items[0];                                    
+                                    if(selectedRow!=undefined){                                                                               
+                                      createNewObj3('tesoreria.modificarReciboPagado',selectedRow.data.ID_BITACORA,selectedRow.data.ID_RECIBO);                                                                    
+                                    }else{
+                                        Ext.MessageBox.alert('Error','¡Seleccione el recibo que va a modificar!');
+                                    }
+                                    
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text:'Exportar Reporte',
+                                iconCls:'icon-xlsx',
+                                handler:function(){                                    
+                                    var FECHA_PAGO_CONTABILIDAD = Ext.getCmp('FECHA_PAGO_CONTABILIDAD').getValue();
+                                    if(FECHA_PAGO_CONTABILIDAD == null){
+                                        Ext.MessageBox.alert('Error','¡Seleccione una fecha de pago!');
+                                    }else{
+                                        window.open("ShowExcel?idOperationType=15&fechaPago="+FECHA_PAGO_CONTABILIDAD);
+                                    }
+                                }
+                            }),
+                            '-',
+                            new Ext.Button({
+                                text: 'Salir',
+                                iconCls:'icon-salir',
+                                handler: function(){
+                                    winTesoreria.close();                            
+                                }
+                            })                            
+                        ]
+                    }); //Termina Toolbar
+                    
+                Ext.apply(this, {
+                    items:[
+                    {
+                        xtype: 'tabpanel',
+                        height: 890,                        
+                        activeTab: 0,
+                        border: false,
+                        items:[
+                            /**************************** PESTAÑA COBROS EN EFECTIVO *************************************/
+                            {
+                                xtype: 'panel',                          
+                                border:false,
+                                tbar: tbUno,
+                                title: 'Cobros en Efectivo',
+                                items: [
+                                    {
+                                        xtype: 'form',  
+                                        id: 'frmCobrosEfectivo',
+                                        border: false,
+                                        items:[
+                                            {
+                                                xtype: 'fieldset',
+                                                height: 165,
+                                                title: 'Filtros',
+                                                items:[
+                                                    Ext.create('Ext.form.ComboBox',{
+                                                        fieldLabel: 'Zona',
+                                                        id:'ID_ZONA',
+                                                        store: stateszonasPC,                                                                                                                                                                                                                          
+                                                        labelWidth: 130,
+                                                        width: 400,                                                                        
+                                                        valueField: 'id',
+                                                        displayField: 'nombre',                                                                        
+                                                        emptyText: 'Seleccione el tipo de Zona...',
+                                                        selectOnFocus: true
+                                                    }),
+                                                    Ext.create('Ext.form.ComboBox', {
+                                                        fieldLabel: 'Recolector',
+                                                        name:'ID_RECOLECTOR',
+                                                        id:'ID_RECOLECTOR',
+                                                        emptyText:'Seleccione el Recolector',                                                            
+                                                        editable:false,
+                                                        width: 400,
+                                                        labelWidth: 130,
+                                                        size: 30,
+                                                        store: storeRecolectoresAdmon,
+                                                        queryMode: 'local',
+                                                        displayField: 'nombre',
+                                                        valueField: 'id'
+                                                    }),
+                                                    {
+                                                        xtype: 'datefield',
+                                                        width: 325,
+                                                        labelWidth: 130,
+                                                        fieldLabel: 'Fecha Visita',
+                                                        id: 'FECHA_VISITA'                                                            
+                                                    },                                                    
+                                                    {
+                                                        xtype: 'textfield',
+                                                        id: 'NUM_RECIBO_TESORERIA_EFECTIVO', 
+                                                        fieldLabel: 'Recibo',
+                                                        hideTrigger: true,
+                                                        labelWidth: 130,
+                                                        size: 10
+                                                    },
+                                                    {
+                                                        xtype: 'textfield',
+                                                        fieldLabel:'Nombre',
+                                                        id:'NOMBRE_DONANTE_TESORERIA_EFECTIVO',                                                                    
+                                                        labelWidth: 130,
+                                                        width: 400,
+                                                        size: 250
+                                                    }
+                                                ] //Cierra items fieldset
+                                            },
+                                            {
+                                                xtype: 'grid',                                                    
+                                                height: 360,
+                                                id: 'gridCobrosEfectivo',
+                                                store: storeGridCobrosEfectivo,
+                                                columns: [
+                                                    {
+                                                        dataIndex: 'ESTATUS_PAGO',
+                                                        text: 'Estatus',
+                                                        flex: .04,
+                                                        align:'center' 
+                                                    },
+                                                    {
+                                                        dataIndex: 'ID_RECIBO',
+                                                        text: 'Recibo',
+                                                        flex: .03,
+                                                        align:'center'                                                               
+                                                    },                                                    
+                                                    {
+                                                        dataIndex: 'NOMBRE',
+                                                        text: 'Donante',
+                                                        flex: .1
+                                                    },
+                                                    {
+                                                        dataIndex: 'NUM_PAGO',
+                                                        text: 'Pago',
+                                                        flex: .02,
+                                                        align:'center'
+                                                    },
+                                                    {
+                                                        dataIndex: 'IMPORTE',
+                                                        text: 'Importe',
+                                                        flex: .03,
+                                                        renderer: render_money
+                                                    },
+                                                    {
+                                                        dataIndex: 'ID_DONATIVO',
+                                                        text: 'Donativo',
+                                                        flex: .04,
+                                                        align:'center'
+                                                    },
+                                                    {
+                                                        dataIndex: 'FECHA_IMPRESION',
+                                                        text: 'Fecha Impresión',
+                                                        flex: .04,
+                                                        align:'center'
+                                                    },
+                                                    {
+                                                        dataIndex: 'FECHA_PAGO',
+                                                        text: 'Fecha Pago',
+                                                        flex: .04                                                       
+                                                    }                                                            
+                                                ], //Cierra columns grid
+                                                viewConfig: {
+
+                                                },
+                                                selModel: Ext.create('Ext.selection.CheckboxModel', {
+
+                                                }),
+                                                bbar: new Ext.PagingToolbar({
+                                                    pageSize: 50,
+                                                    store: storeGridCobrosEfectivo,
+                                                    displayInfo: true,
+                                                    emptyMsg: '¡No hay pagos confirmados el dia de hoy!'  
+                                                })
+                                            }
+                                        ] //Cierra items form
+                                    }
+                                ] //Cierra items cobros en efectivo
+                            }
+                        ] //Cierre items tabPanel
+                    }  
+                    ] //Cierra items ext.apply
+                }); //Cierra Ext.apply 
+//                storeCobrosEfectivo.load();
+                storeGridCobrosEfectivo.load();
+                storeRecolectoresAdmon.load();
+//                storeContabilidad.load();
+                storeContabilidadEspecie.load();
+                tesoreria.tesoreria.superclass.initComponent.apply(this, arguments);
+               
+                } //Cierra initComponent                        
+        }); //Cierra Ext.define
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

@@ -1,0 +1,177 @@
+package com.caritas.action;
+
+import com.caritas.bl.comboboxBL;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionForward;
+
+public class comboboxAC extends DispatchAction {   
+    private final static String SUCCESS = "success";
+    private final static String FAILURE = "failure:";
+    
+    public ActionForward getCatalogByLlave(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";            
+        try {
+            String llave = (request.getParameter("llave") != null && request.getParameter("llave") != "" ? request.getParameter("llave") : "0");                
+            salida = comboboxBL.getCatalogByLlave(llave);                
+            request.setAttribute("resp", salida);
+        } catch (Exception e) {}
+        return mapping.findForward(SUCCESS);
+    }
+  
+    public ActionForward getCatalogByLlaveDos(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+            String salida = "";
+            try {
+                String llave = (request.getParameter("llave") != null && request.getParameter("llave") != "" ? request.getParameter("llave") : "0");
+                salida = comboboxBL.getCatalogByLlaveDos(llave);
+                request.setAttribute("resp", salida);
+            } catch (Exception e) {}
+            return mapping.findForward(SUCCESS);
+        }
+
+    public ActionForward getCatalogByNombre(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+            String salida = "";
+            try {
+                String nombre = (request.getParameter("nombre") != null && request.getParameter("nombre") != "" ? request.getParameter("nombre") : " ");            
+                System.out.println("nombre: "+nombre);
+                salida = comboboxBL.getCatalogByNombre(nombre);
+                request.setAttribute("resp", salida);
+            } catch (Exception e) {}
+            return mapping.findForward(SUCCESS);
+        }
+
+    public ActionForward getSearchCaso(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+            String salida = "";
+            try {
+                String keyword = (String) request.getParameter("keyword");
+                salida = comboboxBL.getSearchCaso(keyword);
+            } catch (Exception e) {}
+            request.setAttribute("resp", salida.toString());
+            return mapping.findForward(SUCCESS);
+        }
+
+    public ActionForward getAllUsuarios(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+            String salida = "";
+            JSONArray jsonList = new JSONArray();
+            try {
+                comboboxBL Usua = new comboboxBL();
+                salida = Usua.getAllUsuarios();                
+                request.setAttribute("resp", salida);
+            } catch (Exception e) {
+            }
+            return mapping.findForward(SUCCESS);
+        }
+
+    public ActionForward getSearchBeneficiarioIngresos(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+            String salida = "";
+            try {
+                String keyword = (String) request.getParameter("keyword");
+                salida = comboboxBL.getBeneficiarioByKeyword(keyword);
+            } catch (Exception e) {
+            }
+            request.setAttribute("resp", salida.toString());
+            return mapping.findForward(SUCCESS);
+        }
+
+    public ActionForward getSearchSustituto(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";
+        try {                
+            int idBitacora = Integer.parseInt(request.getParameter("ID_BITACORA"));                
+            salida = comboboxBL.getSearchSustituto(idBitacora);
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {}
+        return mapping.findForward(SUCCESS);
+    }
+
+    public ActionForward getDireccionesDonante(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";
+        try {
+            int idBitacora = Integer.parseInt(request.getParameter("ID_BITACORA"));
+            salida = comboboxBL.getDireccionesDonante(idBitacora);
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {}
+        return mapping.findForward(SUCCESS);
+    }
+          
+    public ActionForward getRecolectores(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {        
+        String salida = "";
+        int idZona  = 0;
+        try {
+            if(request.getParameter("ID_ZONA") != null){
+                idZona = Integer.parseInt(request.getParameter("ID_ZONA"));
+            }else{
+                idZona = 0;
+            }            
+            salida = comboboxBL.getRecolectores(idZona);
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {
+        }
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getAllRecolectores(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";        
+        try {            
+            salida = comboboxBL.getAllRecolectores();
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {
+        }
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getRecolectoresEspeciales(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {       
+        String salida = "";
+        
+        try {             
+            salida = comboboxBL.getRecolectoresEspeciales();            
+            request.setAttribute("resp", salida);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return mapping.findForward(FAILURE);            
+        }
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getCatalogByNombreConfMasiva(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";            
+        try {
+            String llave = (request.getParameter("llave") != null && request.getParameter("llave") != "" ? request.getParameter("llave") : "0");                
+            salida = comboboxBL.getCatalogByNombreConfMasiva(llave);                
+            request.setAttribute("resp", salida);
+        } catch (Exception e) {}
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getSearchSustitutoDonativos(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";
+        try {                
+            int idDonante = Integer.parseInt(request.getParameter("ID_DONANTE"));            
+            salida = comboboxBL.getSearchSustitutoDonativos(idDonante);
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {}
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getRecolectoresByIdDireccion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {        
+        String salida = "";
+        int idDireccion  = 0;
+        try {
+            if(request.getParameter("ID_DIRECCION") != null){
+                idDireccion = Integer.parseInt(request.getParameter("ID_DIRECCION"));
+            }else{
+                idDireccion = 0;
+            }            
+            salida = comboboxBL.getRecolectoresByIdDireccion(idDireccion);
+            request.setAttribute("resp", salida);            
+        } catch (Exception e) {
+        }
+        return mapping.findForward(SUCCESS);
+    }
+    
+    
+}

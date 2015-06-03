@@ -1,0 +1,214 @@
+div.wpcf7 {
+	margin: 0;
+	padding: 0;
+}
+
+div.wpcf7-response-output {
+	margin: 2em 0.5em 1em;
+	padding: 0.2em 1em;
+}
+
+div.wpcf7-mail-sent-ok {
+	border: 2px solid #398f14;
+}
+
+div.wpcf7-mail-sent-ng {
+	border: 2px solid #ff0000;
+}
+
+div.wpcf7-spam-blocked {
+	border: 2px solid #ffa500;
+}
+
+div.wpcf7-validation-errors {
+	border: 2px solid #f7e700;
+}
+
+span.wpcf7-form-control-wrap {
+	position: relative;
+}
+
+span.wpcf7-not-valid-tip {
+	position: absolute;
+	top: 20%;
+	left: 20%;
+	z-index: 100;
+	background: #fff;
+	border: 1px solid #ff0000;
+	font-size: 10pt;
+	width: 280px;
+	padding: 2px;
+}
+
+span.wpcf7-not-valid-tip-no-ajax {
+	color: #f00;
+	font-size: 10pt;
+	display: block;
+}
+
+span.wpcf7-list-item {
+	margin-left: 0.5em;
+}
+
+.wpcf7-display-none {
+	display: none;
+}
+
+div.wpcf7 img.ajax-loader {
+	border: none;
+	vertical-align: middle;
+	margin-left: 4px;
+}
+
+div.wpcf7 .watermark {
+	color: #888;
+}
+
+.cls-service{background:transparent url(../img/servicio.jpg) 0 0 no-repeat !important;}  
+.cls-area{background:transparent url(../img/home.gif) 0 0 no-repeat !important;}  
+.icon-add {
+    background-image: url(../img/class/add.png) !important;
+}
+
+.icon-user {
+    background-image: url(../img/class/user.png) !important;
+}
+
+.icon-user-add {
+    background-image: url(../img/class/user_add.gif) !important;
+}
+
+.icon-es {
+    background-image: url(../img/class/es.png) !important;
+}
+
+.icon-save {
+    background-image: url(../img/class/save.gif) !important;
+}
+
+.icon-caso {
+    background-image: url(../img/class/casos.png) !important;
+}
+
+.icon-reset {
+    background-image: url(../img/class/stop.png) !important;
+}
+
+.icon-grid {
+    background-image: url(../img/class/grid.png) !important;
+}
+
+.icon-delete {
+    background-image: url(../img/class/delete.png) !important;
+}
+
+.icon-print {
+    background-image: url(../img/class/print.png) !important;
+}
+
+.icon-xlsx{
+    background-image: url(../img/class/xlsx.png) !important;
+}
+
+.icon-salir{
+    background-image: url(../img/class/salir.png) !important;
+}
+
+.icon-money{
+    background-image: url(../img/class/money-icon.png) !important;
+}
+
+.icon-find{
+    background-image: url(../img/find.png) !important;
+}
+
+
+.icon-grafica{
+    background-image: url(../img/class/grafica.png) !important;
+}
+
+.icon-sinConfirmar{
+    background-image: url(../img/class/sinConfirmar.png) !important;
+}
+
+.icon-clear{
+    background-image: url(../img/class/limpiar.png) !important;
+}
+
+
+.icon-editar {
+    background-image: url(../img/class/editar.png) !important;
+}
+
+.icon-update {
+    background-image: url(../img/icon_update.png) !important;
+}
+
+.icon-filter {
+    background-image: url(../img/filter-add-icon.png) !important;
+}
+
+.icon-cancelar {
+    background-image: url(../img/status-1.png) !important;
+}
+
+.icon-clear {
+    background-image: url(../img/class/icon_clear.png) !important;
+}
+
+.ruf-test-1{
+    border: 1px solid blue;
+}
+
+.icon-clip{
+    background-image: url(../img/clip.gif) !important;
+}
+
+
+.icon-cita{
+    background-image: url(../img/class/cita.png) !important;
+}
+
+.icon-reload{
+    background-image: url(../img/class/reload.png) !important;
+}
+
+.icon-expediente{
+     background-image: url(../img/class/expediente.png) !important;
+
+}   
+.icon-new-doc{
+     background-image: url(../img/class/new-doc.png) !important;
+
+}   
+.icon-edit-doc{
+     background-image: url(../img/class/edit-doc.png) !important;
+
+}   
+.icon-pptx{
+     background-image: url(../img/class/pptx.png) !important;
+
+}   
+.icon-registro{
+     background-image: url(../img/class/registro.png) !important;
+
+}   
+.icon-oa{
+     background-image: url(../img/class/OA-iconn.png) !important;
+
+}   
+
+.icon-web-mail-icon{
+     background-image: url(../img/class/web-mail-icon.png) !important;
+
+} 
+
+.icon-pdf{
+     background-image: url(../img/class/pdf.png) !important;
+
+}
+
+.icon-phone{
+     background-image: url(../img/class/phone.png) !important;
+
+}

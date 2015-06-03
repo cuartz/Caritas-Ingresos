@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reciboNoDeducible_rs" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="New Dataset 1"/>
+	<parameter name="ID_BITACORA" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[DECLARE @importe  INT
+SET @importe = (SELECT IMPORTE FROM DB_INGRESOS.dbo.OPE_BITACORA_PAGOS_DONATIVOS WHERE ID_BITACORA = $P{ID_BITACORA})
+DECLARE @letra VARCHAR(MAX)
+DECLARE @lnEntero INT, 
+  @lcRetorno VARCHAR(512), 
+  @lnTerna INT, 
+  @lcMiles VARCHAR(512),
+  @lcCadena VARCHAR(512),
+  @lnUnidades INT, 
+  @lnDecenas INT,
+  @lnCentenas INT,
+  @lnFraccion INT
+
+  SELECT @lnEntero = CAST(@importe AS INT),
+    @lnFraccion = (@importe - @lnEntero) * 100,
+    @lcRetorno = '', 
+    @lnTerna = 1
+
+  WHILE @lnEntero > 0
+  BEGIN /* WHILE */
+    -- Recorro terna por terna
+    SELECT @lcCadena = ''
+    SELECT @lnUnidades = @lnEntero % 10
+    SELECT @lnEntero = CAST(@lnEntero/10 AS INT)
+    SELECT @lnDecenas = @lnEntero % 10
+    SELECT @lnEntero = CAST(@lnEntero/10 AS INT)
+    SELECT @lnCentenas = @lnEntero % 10
+    SELECT @lnEntero = CAST(@lnEntero/10 AS INT)
+
+    -- Analizo las unidades
+    SELECT @lcCadena =
+    CASE /* UNIDADES */
+      WHEN @lnUnidades = 1 AND @lnTerna = 1 THEN 'UNO ' + @lcCadena
+      WHEN @lnUnidades = 1 AND @lnTerna <> 1 THEN 'UN ' + @lcCadena
+      WHEN @lnUnidades = 2 THEN 'DOS ' + @lcCadena
+      WHEN @lnUnidades = 3 THEN 'TRES ' + @lcCadena
+      WHEN @lnUnidades = 4 THEN 'CUATRO ' + @lcCadena
+      WHEN @lnUnidades = 5 THEN 'CINCO ' + @lcCadena
+      WHEN @lnUnidades = 6 THEN 'SEIS ' + @lcCadena
+      WHEN @lnUnidades = 7 THEN 'SIETE ' + @lcCadena
+      WHEN @lnUnidades = 8 THEN 'OCHO ' + @lcCadena
+      WHEN @lnUnidades = 9 THEN 'NUEVE ' + @lcCadena
+      ELSE @lcCadena
+    END /* UNIDADES */
+
+    -- Analizo las decenas
+    SELECT @lcCadena =
+    CASE /* DECENAS */
+      WHEN @lnDecenas = 1 THEN
+        CASE @lnUnidades
+          WHEN 0 THEN 'DIEZ '
+          WHEN 1 THEN 'ONCE '
+          WHEN 2 THEN 'DOCE '
+          WHEN 3 THEN 'TRECE '
+          WHEN 4 THEN 'CATORCE '
+          WHEN 5 THEN 'QUINCE '
+          ELSE 'DIECI' + @lcCadena
+        END
+      WHEN @lnDecenas = 2 AND @lnUnidades = 0 THEN 'VEINTE ' + @lcCadena
+      WHEN @lnDecenas = 2 AND @lnUnidades <> 0 THEN 'VEINTI' + @lcCadena
+      WHEN @lnDecenas = 3 AND @lnUnidades = 0 THEN 'TREINTA ' + @lcCadena
+      WHEN @lnDecenas = 3 AND @lnUnidades <> 0 THEN 'TREINTA Y ' + @lcCadena
+      WHEN @lnDecenas = 4 AND @lnUnidades = 0 THEN 'CUARENTA ' + @lcCadena
+      WHEN @lnDecenas = 4 AND @lnUnidades <> 0 THEN 'CUARENTA Y ' + @lcCadena
+      WHEN @lnDecenas = 5 AND @lnUnidades = 0 THEN 'CINCUENTA ' + @lcCadena
+      WHEN @lnDecenas = 5 AND @lnUnidades <> 0 THEN 'CINCUENTA Y ' + @lcCadena
+      WHEN @lnDecenas = 6 AND @lnUnidades = 0 THEN 'SESENTA ' + @lcCadena
+      WHEN @lnDecenas = 6 AND @lnUnidades <> 0 THEN 'SESENTA Y ' + @lcCadena
+      WHEN @lnDecenas = 7 AND @lnUnidades = 0 THEN 'SETENTA ' + @lcCadena
+      WHEN @lnDecenas = 7 AND @lnUnidades <> 0 THEN 'SETENTA Y ' + @lcCadena
+      WHEN @lnDecenas = 8 AND @lnUnidades = 0 THEN 'OCHENTA ' + @lcCadena
+      WHEN @lnDecenas = 8 AND @lnUnidades <> 0 THEN 'OCHENTA Y ' + @lcCadena
+      WHEN @lnDecenas = 9 AND @lnUnidades = 0 THEN 'NOVENTA ' + @lcCadena
+      WHEN @lnDecenas = 9 AND @lnUnidades <> 0 THEN 'NOVENTA Y ' + @lcCadena
+      ELSE @lcCadena
+    END /* DECENAS */
+
+
+    -- Analizo las centenas
+    SELECT @lcCadena =
+    CASE /* CENTENAS */
+      WHEN @lnCentenas = 1 AND @lnUnidades = 0 AND @lnDecenas = 0 THEN 'CIEN ' + @lcCadena
+      WHEN @lnCentenas = 1 AND NOT(@lnUnidades = 0 AND @lnDecenas = 0) THEN 'CIENTO ' + @lcCadena
+      WHEN @lnCentenas = 2 THEN 'DOSCIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 3 THEN 'TRESCIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 4 THEN 'CUATROCIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 5 THEN 'QUINIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 6 THEN 'SEISCIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 7 THEN 'SETECIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 8 THEN 'OCHOCIENTOS ' + @lcCadena
+      WHEN @lnCentenas = 9 THEN 'NOVECIENTOS ' + @lcCadena
+      ELSE @lcCadena
+    END /* CENTENAS */
+
+    -- Analizo la terna
+    SELECT @lcCadena = 
+    CASE /* TERNA */
+      WHEN @lnTerna = 1 THEN @lcCadena
+      WHEN @lnTerna = 2 AND (@lnUnidades + @lnDecenas + @lnCentenas <> 0) THEN @lcCadena + ' MIL '
+      WHEN @lnTerna = 3 AND (@lnUnidades + @lnDecenas + @lnCentenas <> 0) AND 
+        @lnUnidades = 1 AND @lnDecenas = 0 AND @lnCentenas = 0 THEN @lcCadena + ' MILLON '
+      WHEN @lnTerna = 3 AND (@lnUnidades + @lnDecenas + @lnCentenas <> 0) AND
+        NOT (@lnUnidades = 1 AND @lnDecenas = 0 AND @lnCentenas = 0) THEN @lcCadena + ' MILLONES '
+      WHEN @lnTerna = 4 AND (@lnUnidades + @lnDecenas + @lnCentenas <> 0) THEN @lcCadena + ' MIL MILLONES '
+      ELSE ''
+    END /* TERNA */
+
+    -- Armo el retorno terna a terna
+    SELECT @lcRetorno = @lcCadena  + @lcRetorno
+    SELECT @lnTerna = @lnTerna + 1
+
+  END /* WHILE */
+
+  IF @lnTerna = 1  
+    SELECT @lcRetorno = 'CERO'
+SET @letra=(
+  SELECT RTRIM(@lcRetorno) + ' PESOS ' + LTRIM(STR(@lnFraccion,2)) + '0/100 MN')
+
+PRINT @letra
+
+SELECT  
+  A.ID_BITACORA,
+        ISNULL(A.ID_RECIBO, '') AS ID_RECIBO,
+        C.NOMBRE + ' ' + C.A_PATERNO + ' ' + C.A_MATERNO NOMBRE_DONANTE,
+        C.RAZON_SOCIAL,
+        C.TEL_CASA,
+        C.TEL_OFICINA,
+       '$ '+ CONVERT (VARCHAR, CONVERT(MONEY, A.IMPORTE), 1) +' ( '+ @letra + ' )' AS LETRA,
+        ISNULL(E.NOMBRE, 'NO TIENE') ID_TIPO_DIRECCION,
+        ISNULL(D.CALLE, 'NO TIENE') +' # '+ISNULL(D.NUMERO, 'NO TIENE') +' Col. '+ISNULL(D.COLONIA, 'NO TIENE') + ' Mun. ' + ISNULL(CONVERT(VARCHAR(100),F.NOMBRE), 'NO TIENE') + ' C.P. ' + ISNULL(CONVERT(VARCHAR(50),D.COD_POSTAL), 'NO TIENE')  AS Domicilio ,        
+        ISNULL(D.ENTRE_CALLES, 'NO TIENE') AS ENTRE_CALLES,
+        ISNULL(G.NOMBRE, 'NO TIENE') ESTATUS_PAGO_TMP,
+        ISNULL(H.NOMBRE, 'NO TIENE') ID_FORMA_PAGO,
+        ISNULL(I.NOMBRE, 'NO TIENE') ID_CAMPANA_FINANCIERA,
+        B.NUM_FRECUENCIA, 
+        ISNULL((CASE WHEN (K.NOMBRE = 'CASOS') THEN K.NOMBRE + ' ' + CONVERT(VARCHAR(10), B.NUM_CASO) ELSE K.NOMBRE END), 'NO TIENE') ID_ASIGNACION,
+        ISNULL(M.NOMBRE2, 'NO TIENE') AS ID_ZONA,
+        ISNULL(L.NOMBRE, 'NO TIENE') ID_TIPO_DONATIVO,
+        C.ID_DONANTE,
+        A.ID_NUM_PAGO,
+        C.ID_USUARIO,
+        CONVERT(VARCHAR,current_timestamp,106) Fecha_Actual,
+        B.ID_DONATIVO
+FROM    DB_INGRESOS.dbo.OPE_BITACORA_PAGOS_DONATIVOS A
+        INNER JOIN DB_INGRESOS.dbo.OPE_DONATIVOS_DONANTE B ON A.ID_DONATIVO = B.ID_DONATIVO --DONATIVO
+        INNER JOIN DB_INGRESOS.dbo.OPE_DONANTES C ON B.ID_DONANTE = C.ID_DONANTE --DONANTE
+        LEFT JOIN DB_INGRESOS.DBO.OPE_DIRECCIONES_DONANTE D ON (C.ID_DONANTE = D.ID_DONANTE) AND (D.ID_TIPO_DIRECCION = 2387) --DIRECCION
+        LEFT JOIN BD_ADMIN.DBO.ADM_CATALOGS_VALUES E ON D.ID_TIPO_DIRECCION = E.ID --TIPO DE DIRECCION
+        LEFT JOIN BD_ADMIN.DBO.ADM_CATALOGS_MUNICIPIOS F ON F.ID = D.ID_MUNICIPIO --MUNICIPIO
+        LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES G ON G.ID = A.ESTATUS_PAGO_TMP --ESTATUS DEL RECIBO
+        LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES H ON H.ID = B.ID_FORMA_PAGO --FORMA DE PAGO
+        LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES I ON I.ID = B.ID_CAMPANA_FINANCIERA --CAMPAÑA FINANCIERA
+        LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES K ON K.ID = B.ID_ASIGNACION --ASIGNACION
+        LEFT JOIN BD_ADMIN.DBO.ADM_CATALOGS_VALUES L ON B.ID_TIPO_DONATIVO = L.ID --TIPO DE DONATIVO
+        LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES M ON D.ID_ZONA = M.ID --ZONA
+        WHERE A.ID_BITACORA = $P{ID_BITACORA}]]>
+	</queryString>
+	<field name="ID_BITACORA" class="java.math.BigDecimal"/>
+	<field name="ID_RECIBO" class="java.lang.String"/>
+	<field name="NOMBRE_DONANTE" class="java.lang.String"/>
+	<field name="RAZON_SOCIAL" class="java.lang.String"/>
+	<field name="TEL_CASA" class="java.math.BigDecimal"/>
+	<field name="TEL_OFICINA" class="java.math.BigDecimal"/>
+	<field name="LETRA" class="java.lang.String"/>
+	<field name="ID_TIPO_DIRECCION" class="java.lang.String"/>
+	<field name="Domicilio" class="java.lang.String"/>
+	<field name="ENTRE_CALLES" class="java.lang.String"/>
+	<field name="ESTATUS_PAGO_TMP" class="java.lang.String"/>
+	<field name="ID_FORMA_PAGO" class="java.lang.String"/>
+	<field name="ID_CAMPANA_FINANCIERA" class="java.lang.String"/>
+	<field name="NUM_FRECUENCIA" class="java.math.BigDecimal"/>
+	<field name="ID_ASIGNACION" class="java.lang.String"/>
+	<field name="ID_ZONA" class="java.lang.String"/>
+	<field name="ID_TIPO_DONATIVO" class="java.lang.String"/>
+	<field name="ID_DONANTE" class="java.math.BigDecimal"/>
+	<field name="ID_NUM_PAGO" class="java.math.BigDecimal"/>
+	<field name="ID_USUARIO" class="java.lang.String"/>
+	<field name="Fecha_Actual" class="java.lang.String"/>
+	<field name="ID_DONATIVO" class="java.math.BigDecimal"/>
+	<variable name="APOYO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="DONATIVO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="179" y="6" width="207" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CÁRITAS DE MONTERREY A.B.P.
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="20" width="324" height="20"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Francisco G. Sada 2810 Pte. Col. Deportivo Obispado C.P. 64040
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="31" width="324" height="20"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Tel. 1340-2060 y 70 Monterrey, N.L., México RFC. CMO-820811-NX9
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="462" y="29" width="110" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="442" y="17" width="20" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[No.
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="0" width="570" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="462" y="7" width="104" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_RECIBO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="440" y="41" width="122" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Recibo de Pago]]></text>
+			</staticText>
+			<image>
+				<reportElement x="5" y="3" width="115" height="60"/>
+				<imageExpression><![CDATA["C:\\Proyecto\\Ingresos\\web\\img\\logo.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="431">
+			<textField>
+				<reportElement x="104" y="18" width="311" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOMBRE_DONANTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="473" y="18" width="89" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RAZON_SOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="63" width="52" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEL_CASA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="373" y="102" width="189" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_CAMPANA_FINANCIERA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="215" y="122" width="78" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_NUM_PAGO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="87" y="103" width="148" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_ASIGNACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="42" width="427" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Domicilio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="293" y="142" width="179" height="30"/>
+				<textElement>
+					<font fontName="Arial" size="13"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_FORMA_PAGO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="541" y="42" width="21" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_ZONA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="358" y="121" width="82" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_DONANTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="121" width="62" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_DONATIVO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="179" y="62" width="60" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEL_OFICINA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="122" width="49" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_FRECUENCIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="462" y="217" width="100" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Fecha_Actual}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="14" y="18" width="80" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Recibimos de:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="12" y="42" width="56" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Domicilio:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="12" y="63" width="56" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Tel. Casa:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="123" y="62" width="56" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Tel. Oficina:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="80" y="30" width="482" height="1"/>
+			</line>
+			<line>
+				<reportElement x="68" y="55" width="494" height="1"/>
+			</line>
+			<line>
+				<reportElement x="68" y="74" width="52" height="1"/>
+			</line>
+			<line>
+				<reportElement x="179" y="75" width="60" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="12" y="81" width="56" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Cantidad:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="68" y="95" width="494" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="103" width="55" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Asignación:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="101" width="100" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Campaña Financiera:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="123" width="54" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Frecuencia:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="137" y="122" width="78" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Núm. Aportación:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="293" y="121" width="65" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[No. Donante:
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="122" width="62" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[No. Donativo:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="215" y="134" width="78" height="1"/>
+			</line>
+			<line>
+				<reportElement x="358" y="132" width="82" height="1"/>
+			</line>
+			<line>
+				<reportElement x="88" y="135" width="49" height="1"/>
+			</line>
+			<line>
+				<reportElement x="504" y="133" width="58" height="1"/>
+			</line>
+			<line>
+				<reportElement x="69" y="114" width="166" height="1"/>
+			</line>
+			<line>
+				<reportElement x="339" y="114" width="223" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="172" width="530" height="17"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Para Obtener su recibo deducible de impuestos ingresar a www.caritas.org.mx o llamar al 13402060 y 70 proporcione su
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="14" y="183" width="530" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[correo electrónico y se lo enviaremos. Es indispensable solicitarlo dentro de los dos meses siguentes en que otorgó su donativo.
+                ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="217" width="69" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Monterrey N.L.
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="457" y="229" width="105" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="239" y="61" width="88" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[ENTRE CALLES:
+                ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="373" y="61" width="189" height="34"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENTRE_CALLES}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="321" y="74" width="241" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="513" y="43" width="28" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Zona:
+                ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="-63" width="1" height="312"/>
+			</line>
+			<line>
+				<reportElement x="571" y="-63" width="1" height="313"/>
+			</line>
+			<line>
+				<reportElement x="0" y="249" width="572" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="69" y="82" width="493" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LETRA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="455" y="232" width="104" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[Fecha Impresión]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,539 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.caritas.bl;
+
+import com.caritas.utils.MConnection;
+import com.caritas.utils.MD5Hashing;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author RCastilloc
+ */
+public class adminusersBL {
+
+    public static String uptProfile(String perfil, String permissions) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            String sqlQuery = "UPDATE BD_ADMIN.dbo.ADM_PERFIL SET PERMISOS= ? WHERE ID_PERFIL = ?";
+
+            call = conn.prepareCall(sqlQuery);
+            call.setString(1, permissions);
+            call.setString(2, perfil);
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String addProfile(String name, String permissions) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            String sqlQuery = "INSERT INTO BD_ADMIN.dbo.ADM_PERFIL (DESCRIPCION,PERMISOS) VALUES(UPPER(?),?)";
+            call = conn.prepareCall(sqlQuery);
+            call.setString(1, name);
+            call.setString(2, permissions);
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String delProfile(String perfil) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            String sqlQuery = "DELETE FROM BD_ADMIN.dbo.ADM_PERFIL WHERE ID_PERFIL=?";
+            call = conn.prepareCall(sqlQuery);
+            call.setString(1, perfil);
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String getPermisos(String perfil) {
+        String resp = "";
+        perfil = perfil.equals("") ? "0" : perfil;
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+
+        JSONObject respuesta = new JSONObject();
+        JSONArray padres = new JSONArray();
+
+
+        try {
+            String nombrepadre = "";//MODIFICO ID_APLICACION=3 AND
+//            st = conn.prepareStatement("SELECT DISTINCT ID_PADRE FROM BD_ADMIN.dbo.ADM_PERMISOS WHERE ID_PADRE IS NOT NULL ORDER BY ID_PADRE");
+            st = conn.prepareStatement("SELECT DISTINCT ID_PADRE FROM BD_ADMIN.dbo.ADM_PERMISOS WHERE ID_APLICACION=3 AND ID_PADRE IS NOT NULL ORDER BY ID_PADRE");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONArray hijos = new JSONArray();
+                st = conn.prepareStatement("SELECT A.ID,A.MODULO, B.MODULO PADRE, CASE WHEN (SELECT B.ID FROM BD_ADMIN.dbo.ADM_PERMISOS B WHERE ID IN(SELECT COL AS PERM FROM F_ConvertStringToTable((SELECT PERMISOS FROM BD_ADMIN.dbo.ADM_PERFIL WHERE ID_PERFIL=?), ';')) AND B.ID=A.ID) IS NOT NULL THEN 1 ELSE 0 END CHECKED FROM BD_ADMIN.dbo.ADM_PERMISOS A INNER JOIN (SELECT * FROM BD_ADMIN.dbo.ADM_PERMISOS WHERE ID_PADRE IS NULL) B ON A.ID_PADRE=B.ID WHERE A.ID_PADRE=?");
+                st.setString(1, perfil);
+                st.setString(2, rs.getString("id_padre"));
+                rs2 = st.executeQuery();
+                System.out.println("Padre:" + rs.getString("id_padre"));
+                while (rs2.next()) {
+                    nombrepadre = rs2.getString("padre");
+                    System.out.println("Hijo:" + rs2.getString("id"));
+                    JSONObject hijo = new JSONObject();
+                    hijo.put("id", rs2.getString("id"));
+                    hijo.put("text", rs2.getString("modulo"));
+                    hijo.put("leaf", true);
+                    hijo.put("checked", rs2.getString("checked").equals("1") ? true : false);
+                    hijos.put(hijo);
+                }
+
+                JSONObject padre = new JSONObject();
+                padre.put("text", nombrepadre);
+                padre.put("cls", "folder");
+                padre.put("expanded", true);
+                padre.put("children", hijos);
+                padres.put(padre);
+
+            }
+//            respuesta.put("rows", padres);
+            System.out.println(padres.toString());
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }
+            resp = padres.toString();
+        }
+        return resp;
+    }
+
+    public static String getZona() {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        JSONObject respuesta = new JSONObject();
+        JSONArray datos = new JSONArray();
+
+        try {
+            st = conn.prepareStatement("SELECT ID,NOMBRE FROM BD_ADMIN.dbo.ADM_CATALOGS_VALUES A  where ID_CATALOG=53");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONObject dato = new JSONObject();
+                dato.put("ID", rs.getString("ID"));
+                dato.put("NOMBRE", rs.getString("NOMBRE"));
+                datos.put(dato);
+            }
+            respuesta.put("rows", datos);
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }
+            resp = respuesta.toString();
+        }
+        return resp;
+    }
+
+    public static String getProfiles() {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        JSONObject respuesta = new JSONObject();
+        JSONArray datos = new JSONArray();
+
+        try {//MODIFICADO WHERE ID_APLICACION=3
+            st = conn.prepareStatement("SELECT A.ID_PERFIL, DESCRIPCION,ISNULL(TOTAL,0) TOTAL FROM BD_ADMIN.dbo.ADM_PERFIL A LEFT JOIN (SELECT ID_PERFIL, COUNT(*) TOTAL FROM BD_ADMIN.dbo.ADM_USUARIOS GROUP BY ID_PERFIL) B ON A.ID_PERFIL=B.ID_PERFIL WHERE ID_APLICACION=3");
+//            st = conn.prepareStatement("SELECT A.ID_PERFIL, DESCRIPCION,ISNULL(TOTAL,0) TOTAL FROM BD_ADMIN.dbo.ADM_PERFIL A LEFT JOIN (SELECT ID_PERFIL, COUNT(*) TOTAL FROM ADM_USUARIOS GROUP BY ID_PERFIL) B ON A.ID_PERFIL=B.ID_PERFIL");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONObject dato = new JSONObject();
+                dato.put("id", rs.getString("id_perfil"));
+                dato.put("descripcion", rs.getString("descripcion"));
+                dato.put("total", rs.getString("total"));
+                datos.put(dato);
+            }
+            respuesta.put("rows", datos);
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }
+            resp = respuesta.toString();
+        }
+        return resp;
+    }
+
+    public static String getUsers(String perfil) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        JSONObject respuesta = new JSONObject();
+        JSONArray datos = new JSONArray();
+
+        try {
+//            String sqlQuery = "SELECT ID_USUARIO,NOMBRE,'************' PASSWORD,EMAIL,A.ID_PERFIL,DESCRIPCION PERFIL,ID_ZONA FROM BD_ADMIN.dbo.ADM_USUARIOS A INNER JOIN BD_ADMIN.dbo.ADM_PERFIL B ON A.ID_PERFIL=B.ID_PERFIL ORDER BY NOMBRE";
+            String sqlQuery = "SELECT ID_USUARIO,A.NOMBRE,'************' PASSWORD,EMAIL,A.ID_PERFIL,DESCRIPCION PERFIL,C.NOMBRE ID_ZONA FROM BD_ADMIN.dbo.ADM_USUARIOS A left JOIN BD_ADMIN.dbo.ADM_PERFIL B ON A.ID_PERFIL=B.ID_PERFIL left JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES C ON C.ID=A.ID_ZONA  ORDER BY A.NOMBRE";
+            if (perfil.equals("")) {
+                sqlQuery = sqlQuery.replace("<PERFIL>", "");
+            } else {
+                sqlQuery = sqlQuery.replace("<PERFIL>", " AND B.ID_PERFIL=" + perfil);
+            }
+
+            st = conn.prepareStatement(sqlQuery);
+
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONObject dato = new JSONObject();
+                dato.put("id", rs.getString("id_usuario"));
+                dato.put("nombre", rs.getString("nombre"));
+                dato.put("password", rs.getString("password"));
+                dato.put("email", rs.getString("email"));
+                dato.put("id_perfil", rs.getString("id_perfil"));
+                dato.put("perfil", rs.getString("perfil"));
+                dato.put("id_zona", rs.getString("id_zona"));
+                datos.put(dato);
+            }
+            respuesta.put("rows", datos);
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }
+            resp = respuesta.toString();
+        }
+        return resp;
+    }
+
+    public static String delUser(String idUser) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            String sqlQuery = "DELETE BD_ADMIN.dbo.ADM_USUARIOS WHERE ID_USUARIO=?";
+            call = conn.prepareCall(sqlQuery);
+            call.setString(1, idUser);
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String uptUser(String idUser, String name, String password, String email, String perfil, String id_zona) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            if (!password.equals("************")) {
+                String sqlQuery = "UPDATE BD_ADMIN.dbo.ADM_USUARIOS SET NOMBRE=UPPER(?),PASSWORD=?,EMAIL=?,ID_PERFIL=?,ID_ZONA=? WHERE ID_USUARIO=?";
+                call = conn.prepareCall(sqlQuery);
+                call.setString(1, name);
+                call.setString(2, MD5Hashing.getMD5(password));
+                call.setString(3, email);
+                call.setString(4, perfil);
+                call.setString(5, id_zona);
+                call.setString(6, idUser);
+                
+            } else {
+                String sqlQuery = "UPDATE BD_ADMIN.dbo.ADM_USUARIOS SET NOMBRE=UPPER(?),EMAIL=?, ID_PERFIL=?,ID_ZONA=? WHERE ID_USUARIO=?";
+                call = conn.prepareCall(sqlQuery);
+                call.setString(1, name);
+                call.setString(2, email);
+                call.setString(3, perfil);
+                call.setString(4, id_zona);
+                call.setString(5, idUser);
+                
+            }
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String addUser(String idUser, String name, String password, String email, String perfil,String id_zona) {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        CallableStatement call = null;
+
+        try {
+            String sqlQuery = "INSERT INTO BD_ADMIN.dbo.ADM_USUARIOS (ID_USUARIO,NOMBRE,PASSWORD,EMAIL,ID_PERFIL,ID_ZONA) VALUES(?,UPPER(?),UPPER(?),?,?,?)";
+//            String sqlQuery = "INSERT INTO BD_ADMIN.dbo.ADM_USUARIOS (ID_USUARIO,NOMBRE,PASSWORD,EMAIL,ID_PERFIL,ID_ZONA) VALUES(?,UPPER(?),UPPER(?),?,?,?)";
+            call = conn.prepareCall(sqlQuery);
+            call.setString(1, idUser.toUpperCase());
+            call.setString(2, name);
+            call.setString(3, MD5Hashing.getMD5(password));
+            call.setString(4, email);
+            call.setString(5, perfil);
+            call.setString(6, id_zona);
+//System.out.println(sqlQuery);
+
+            if (!call.execute()) {
+                resp = "OK";
+            }
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            resp = ex.getMessage();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    resp = ext.getMessage();
+                }
+                conn = null;
+            }
+        }
+        return resp;
+    }
+
+    public static String getApps() {
+        String resp = "";
+
+        MConnection objConn = new MConnection();
+        Connection conn = objConn.getConnection();
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        JSONObject respuesta = new JSONObject();
+        JSONArray datos = new JSONArray();
+
+        try {
+            st = conn.prepareStatement("SELECT  A.ID_APLICACION,A.NOMBRE,ISNULL(B.TOTAL,0) TOTAL "
+                    //                    + "FROM db_Admin.dbo.ADM_APPS A "
+                    + "FROM BD_ADMIN.dbo.ADM_APPS A "
+                    + "LEFT JOIN (  SELECT  ID_APLICACION,COUNT(*) TOTAL "
+                    + "FROM BD_ADMIN.dbo.ADM_USUARIOS GROUP BY ID_APLICACION ) B ON A.ID_APLICACION = B.ID_APLICACION");
+//                    + "FROM db_Admin.dbo.ADM_USUARIOS GROUP BY ID_APLICACION ) B ON A.ID_APLICACION = B.ID_APLICACION");
+//            st = conn.prepareStatement("SELECT A.ID_APLICACION,A.NOMBRE, ISNULL(PERFILES,0)TOTAL FROM db_Admin.dbo.ADM_APPS A");
+//            st = conn.prepareStatement("SELECT A.ID_PERFIL, DESCRIPCION,ISNULL(TOTAL,0) TOTAL FROM OPE_PERFIL A LEFT JOIN (SELECT ID_PERFIL, COUNT(*) TOTAL FROM OPE_USUARIOS GROUP BY ID_PERFIL) B ON A.ID_PERFIL=B.ID_PERFIL");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONObject dato = new JSONObject();
+                dato.put("ID_APLICACION", rs.getString("ID_APLICACION"));
+                dato.put("NOMBRE", rs.getString("NOMBRE"));
+                dato.put("TOTAL", rs.getString("TOTAL"));
+                datos.put(dato);
+            }
+            respuesta.put("rows", datos);
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }
+            resp = respuesta.toString();
+        }
+        return resp;
+    }
+}

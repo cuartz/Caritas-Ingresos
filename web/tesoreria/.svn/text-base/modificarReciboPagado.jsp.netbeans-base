@@ -1,0 +1,109 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page language="java" %>
+<%@page import="org.apache.struts.Globals" %>
+<%@page import="java.util.Locale" %>
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<html>
+    <head>       
+       <script type="text/javascript">
+       Ext.define('tesoreria.modificarReciboPagado', {
+            extend: 'Ext.window.Window',           
+            alias:'widget.modificarReciboPagado',                
+            title: 'Modificar Recibo Pagado',
+            width: 400,                
+            height: 130,
+            border: false,
+            buttonAlign: 'left',
+            layout: 'fit',
+            maximizable: true,
+            closeAction : 'close',
+            region:'center',
+            initComponent: function() {
+                var winModificarRecibo = this;
+                var idBitacoraModRec    = this.name;
+                var idReciboModRec      = this.nameDos;
+                //alert(idBitacoraModRec);
+                
+                var tbModificarReciboTesoreria = new Ext.Toolbar({
+                    items:[                      
+                        new Ext.Button({
+                            text:'Guardar',
+                            iconCls: 'icon-save',
+                            handler:function(){                                                        
+                                var json = winModificarRecibo.getDatas();
+                                //alert("Guardar: "+json);
+                                Ext.Msg.confirm('Modificar Fecha', '¿Los datos son correctos?', function(btn, text){
+                                    if (btn == 'yes'){
+                                        Ext.getCmp('frmTesoreriaModificarReciboPagado').getForm().submit({
+                                            url: 'tesoreriaAC.do?method=reciboModificarFechaPago&jsonData='+json+'&idBitacora='+idBitacoraModRec,
+                                            waitMsg: 'Guardando...',
+                                            success: function(form, action) {
+                                                Ext.getCmp('gridContabilidad').getStore().load();                                                    
+                                                winModificarRecibo.destroy();
+                                                Ext.MessageBox.alert('Guardado','La información se modificó correctamente'); 
+                                            },
+                                            failure: function(form, action) {
+                                                Ext.MessageBox.alert('Error','¡Ocurrio un error al modificara la información!');
+                                            }
+                                        });                             
+                                    }
+                                })
+                            }
+                        }),
+                        '-',                             
+                        new Ext.Button({
+                            text: 'Salir',
+                            iconCls:'icon-salir',
+                            handler: function(){
+                                winModificarRecibo.destroy();                            
+                            }
+                        })                            
+                    ]
+                }); //Termina Toolbar
+                
+                Ext.apply(this, {
+                    items:[
+                        {
+                            xtype: 'form',
+                            id: 'frmTesoreriaModificarReciboPagado',
+                            border: false,                            
+                            tbar: tbModificarReciboTesoreria,
+                            items:[
+                                {
+                                    xtype: 'displayfield',
+                                    width: 293,                                    
+                                    value: idReciboModRec,
+                                    labelWidth: 100,
+                                    fieldLabel: 'Recibo'
+                                },
+                                {
+                                    xtype: 'datefield', 
+                                    id:'FECHA_PAGO_TESORERIA',                                    
+                                    fieldLabel: 'Fecha Pago'
+                                }
+                            ]
+                        }
+                    ] //Cierra items ext.apply
+                }) //Cierra Ext.apply
+                tesoreria.modificarReciboPagado.superclass.initComponent.apply(this, arguments); 
+            }, //Cierra initComponent
+            getDatas: function (){//Obtiene cada uno de los valores de los campos necesarios para crear un servicio y no deja guardar si falta alguno
+                var camposName=['FECHA_PAGO_TESORERIA']
+
+                var camposValue = {'FECHA_PAGO_TESORERIA':''};                           
+
+                var pos=0;
+                var value = '';             
+
+                for(pos=0;pos<camposName.length;pos++){
+                    value = Ext.getCmp(camposName[pos]).getValue();
+                    camposValue[camposName[pos]] = value;                                                                                                            
+                }                                 
+                return Ext.encode(camposValue);
+            }
+       }); //Cierra Ext.define
+       </script>
+    </head>
+    <body>
+    </body>
+</html>

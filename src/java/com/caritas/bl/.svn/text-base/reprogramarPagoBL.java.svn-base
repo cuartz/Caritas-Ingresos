@@ -1,0 +1,116 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.caritas.bl;
+
+import com.caritas.utils.MConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author rnunez
+ */
+public class reprogramarPagoBL {       
+     public static String getFechas(int idBitacora) {
+       String resp = "";        
+        MConnection objConn = new MConnection();        
+        Connection conn = objConn.getConnection();
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        JSONObject respuesta = new JSONObject();
+        JSONArray datos = new JSONArray();       
+        try {
+            
+            st = conn.prepareCall("{ call [DB_INGRESOS].[dbo].REPROGRAMAR_PAGO_GET_FECHAS(?)}");
+            st.setInt(1, idBitacora);    
+            rs = st.executeQuery();
+            while (rs.next()) {
+                JSONObject dato = new JSONObject();
+                dato.put("FECHA_COBRO", rs.getString("FECHA_COBRO"));
+                dato.put("FECHA_PAGO", rs.getString("FECHA_PAGO"));
+                dato.put("FECHA_VISITA", rs.getString("FECHA_VISITA"));                
+                datos.put(dato);                
+            }
+            respuesta.put("rows", datos);            
+
+        } catch (SQLException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            System.out.println("<SQLException>> " + ex.getMessage());
+            Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                    rs.close();
+                } catch (Exception ext) {
+                    System.out.println("<SQLException>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+                rs = null;
+            }            
+            resp = respuesta.toString();
+        }        
+        return resp;
+    }
+    
+    public static int updateFechaPago(net.sf.json.JSONObject jsonObject, int idBitacora, String idUsuario) {        
+        int result_insert = 0;     
+        ResultSet rs = null;
+        PreparedStatement st = null;        
+        MConnection objConn = new MConnection();
+        Connection conn = null;        
+            
+        try {
+            conn = objConn.getConnection();
+            st = conn.prepareCall("{ call [DB_INGRESOS].[dbo].CONFIRMACION_UPDATE_FECHA_PAGO(?,?,?,?,?,?,?)}");
+            st.setInt(1, idBitacora);      
+            st.setString(2, jsonObject.getString("NUEVA_FECHA_VISITA_PR")); 
+            st.setInt(3, jsonObject.getInt("ID_DIRECCION_PR")); 
+            st.setInt(4, jsonObject.getInt("ID_RECOLECTOR_PR"));             
+            st.setInt(5, jsonObject.getInt("ID_MOTIVO_REPROGRAMAR_PR"));  
+            st.setString(6, jsonObject.getString("COMENTARIOS_REPROGRAMAR_PR")); 
+            st.setString(7, idUsuario); 
+                        
+            rs = st.executeQuery();
+            if (rs.next()){
+                result_insert = rs.getInt("RESULTADO");
+            } 
+            
+        }catch (net.sf.json.JSONException json_ex) {
+            System.out.println("JSONException::>" + json_ex.getMessage());
+        }catch (SQLException sql_ex) {
+            sql_ex.printStackTrace();
+        } finally {
+            objConn.closeConnection();
+            if (conn != null) {
+                try {
+                    st.close();
+                    conn.close();
+                } catch (Exception ext) {
+                    System.out.println("<savedonante>> " + ext.getMessage());
+                    Logger.getLogger(MConnection.class.getName()).log(Level.SEVERE, null, ext);
+                }
+                st = null;
+                conn = null;
+            }
+        }
+        return result_insert;
+    }
+}

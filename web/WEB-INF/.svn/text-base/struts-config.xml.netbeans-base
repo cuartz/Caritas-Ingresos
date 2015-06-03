@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+    <global-forwards>
+        <forward name="home"  path="/home.do"/>
+    </global-forwards>
+
+    <action-mappings>
+        <action path="/catalogs" type="com.caritas.action.catalogsAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action path="/adminusers" type="com.caritas.action.adminusersAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/helpServicesAC" type="com.caritas.action.helpServicesAC">
+            <forward name="success" path="/response.jsp"/>
+            <forward name="error" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/registroAC" type="com.caritas.action.registroAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/citasAC" type="com.caritas.action.citasAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/solicitudInvestigacionAC" type="com.caritas.action.solicitudInvestigacionAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/resultadoInvestigacionAC" type="com.caritas.action.resultadoInvestigacionAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/solicitudchequeAC" type="com.caritas.action.solicitudchequeAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/serAsignadoAC" type="com.caritas.action.serAsignadoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/datosServicioAC" type="com.caritas.action.datosServicioAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/estSocioAC" type="com.caritas.action.estSocioAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/login" type="com.caritas.action.loginAC">
+            <forward name="success" path="/index.jsp"/>
+        </action>
+        <action parameter="method" path="/addFileAC" type="com.caritas.action.addFileAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action path="/showAddNewFile" forward="/addNewFile.jsp"/>        
+        <action parameter="method" path="/eorganizacional" type="com.caritas.action.eorganizacionalAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>        
+        <action parameter="method" path="/citaEstudioAC" type="com.caritas.action.citaEstudioAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>        
+        <action parameter="method" path="/ingresosAC" type="com.caritas.action.ingresosAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/reportesAC" type="com.caritas.action.reportesAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/historialOAAC" type="com.caritas.action.historialOAAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action path="/adminProvDireccionAC" type="com.caritas.action.adminProvDireccionAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/proveedorAC" type="com.caritas.action.proveedorAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/listaConfirmacionAC" type="com.caritas.action.listaConfirmacionAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/comboboxAC" type="com.caritas.action.comboboxAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/donanteAC" type="com.caritas.action.donanteAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/listaConfirmacionAC" type="com.caritas.action.listaConfirmacionAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+         <action parameter="method" path="/confirmacionPagoAC" type="com.caritas.action.confirmacionPagoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+         <action parameter="method" path="/reprogramarPagoAC" type="com.caritas.action.reprogramarPagoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/cancelarPagoAC" type="com.caritas.action.cancelarPagoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/datosChequeAC" type="com.caritas.action.datosChequeAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+         <action parameter="method" path="/donativoAC" type="com.caritas.action.donativoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+         <action parameter="method" path="/datosTCAC" type="com.caritas.action.datosTarjetaAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+         <action parameter="method" path="/bitacoraPagosAC" type="com.caritas.action.bitacoraPagosAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/datosDepositoAC" type="com.caritas.action.datosDepositoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/sinConfirmarAC" type="com.caritas.action.sinConfirmarAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/tesoreriaAC" type="com.caritas.action.tesoreriaAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/datosTransferenciaAC" type="com.caritas.action.datosTransferenciaAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/datosTarjetaDebitoAC" type="com.caritas.action.datosTarjetaDebitoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action> 
+        <action parameter="method" path="/actualizarDatosPagoAC" type="com.caritas.action.actualizarDatosPagoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+<!--        <action path="/reportesAC" type="com.caritas.action.reportesAC"/>-->
+        <action parameter="method" path="/reportesAC" type="com.caritas.action.reportesAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action parameter="method" path="/cartasAC" type="com.caritas.action.cartasAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        
+        
+        <action parameter="method" path="/agregarDatosPagoAC" type="com.caritas.action.agregarDatosPagoAC">
+            <forward name="success" path="/response.jsp"/>
+        </action>
+        <action path="/home" forward="/home.jsp"/>
+    </action-mappings>
+    
+    <controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>
+    <message-resources parameter="com/caritas/properties/ApplicationResource"/>   
+    
+    <plug-in className="org.apache.struts.tiles.TilesPlugin" >
+        <set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml" />
+        <set-property property="moduleAware" value="true" />
+    </plug-in>
+    
+    <!-- ========================= Validator plugin ================================= -->
+    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+        <set-property
+            property="pathnames"
+            value="/WEB-INF/validator-rules.xml,/WEB-INF/validation.xml"/>
+    </plug-in>  
+</struts-config>

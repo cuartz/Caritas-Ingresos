@@ -1,0 +1,67 @@
+/*** For Sucky Browsers (targets IE 6 and earlier) ***/
+
+/* png fix */
+
+/* layout sizing adjustments */
+.contentArea {
+	margin: 0;
+	padding-left: 26px;}
+.one-third, .two-thirds, .half-page, .full-page {
+	margin: 0;
+	padding: 0 10px 0 25px;}
+#Footer .one-third, #Footer .two-thirds, #Footer .half-page {
+	margin: 0;
+	padding: 0 25px 0 25px;}
+#Footer .contentArea {width: 964px;}
+
+.ribbon { position: relative; }
+
+/* fix spacing issues */
+.portfolio {margin-left: -31px;}
+.portfolio-item {margin-left: 0; padding: 0 0 0 31px;}
+.two-thirds .portfolio-item {padding-right: 10px;}
+
+.sideNav li a	{ zoom: 1; }
+.sideNavWrapper	{ margin: 0;}
+
+a.slidePrev 	{ margin: 0 0 0 6px; }
+a.slideNext		{ margin: 0 6px; }
+
+.hr	{margin-bottom: 0;}
+
+/* Slide show - Gallery View */
+/* TRANSPARENT BORDER FIX FOR IE6 */
+*html .pointer { filter: chroma(color=pink); }
+
+/* menu */
+li li a .sf-sub-indicator { top: 0.9em; }
+.sf-sub-indicator { background-image: url("../images/arrows-ffffff.gif"); }
+.sf-menu ul .sf-sub-indicator { background-position:  -10px 0; }
+
+/* login modal */
+#fancy_content .loginForm .hr { margin-bottom: 0;}
+#fancy_content .loginForm .signInButton { margin-top: -5px;}
+
+/* top reveal */
+#ContentPanel .closeBtn {background: transparent url("../images/fancybox/smallClose-dark-ie6.gif") repeat scroll 0 0;}
+
+/* lightbox */
+#fancybox-img{-ms-interpolation-mode:bicubic}
+#fancybox-loading.fancybox-ie div{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_loading.png',sizingMethod='scale')}
+.fancybox-ie #fancybox-close{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_close.png',sizingMethod='scale');zoom:1;position:absolute;top:-15px;right:-15px;width:30px;height:30px}
+.fancybox-ie #fancybox-title-over{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/fancy_title_over.png',sizingMethod='scale');zoom:1}
+.fancybox-ie #fancybox-title-left{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/title_left.png',sizingMethod='scale')}
+.fancybox-ie #fancybox-title-main{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/title_main.png',sizingMethod='scale')}
+.fancybox-ie #fancybox-title-right{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/title_right.png',sizingMethod='scale')}
+.fancybox-ie #fancybox-left-ico{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancyBox-prev.png',sizingMethod='scale')}
+.fancybox-ie #fancybox-right-ico{background:transparent;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancyBox-next.png',sizingMethod='scale')}
+.fancybox-ie .fancy-bg{background:transparent!important}
+.fancybox-ie #fancy-bg-n{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_n.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-ne{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_ne.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-e{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_e.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-se{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_se.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-s{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_s.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-sw{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_sw.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-w{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_w.png',sizingMethod='scale')}
+.fancybox-ie #fancy-bg-nw{filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/fancybox/v1.3/fancy_shadow_nw.png',sizingMethod='scale')}
+

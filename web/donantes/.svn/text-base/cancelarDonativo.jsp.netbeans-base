@@ -1,0 +1,174 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    HttpSession sesion = request.getSession();
+    String idusersession = "";
+    try {
+        if (sesion.getAttribute("idusersession") != null) {
+            idusersession = sesion.getAttribute("idusersession").toString();
+        }
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+
+%>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+        <script type="text/javascript">
+        /********************* VARIABLES GLOBALES ***********************/
+        var idUsuarioTmp    = '<%=idusersession%>';
+        var idUsuarioSplit  = idUsuarioTmp.split(":");
+        var idUsuario       = idUsuarioSplit[0];
+        var winCancelarDonativo;
+        var idDonativoCD;
+        
+        /********************** MODELS ****************************/
+        Ext.define('catalog',{
+            id:'catalog',
+            extend: 'Ext.data.Model',
+            fields: ['id','id_catalog','nombre','status']
+        })
+        
+        /********************** FUNCIONES JAVASCRIPT ****************************/
+        function vCancelaDonativo(){
+            if(Ext.getCmp("MOTIVO_CANCELACION").getValue() == ""){
+                Ext.MessageBox.alert('Error','!Ingresa el motivo de la cancelación!');                   
+                return false
+            }
+        }
+        
+        /********************** STORES ****************************/
+        var storesMotivoCancelacion = Ext.create('Ext.data.JsonStore', {
+            model: 'catalog',
+            proxy: {
+                type: 'ajax',
+                url: 'comboboxAC.do?method=getCatalogByLlave', //method=getAllHelpServices
+                extraParams:{llave:'INGRESOS_TIPO_CANCELACION'},
+                reader: {
+                    type: 'json',
+                    root: 'rows'
+                }
+            }
+        });
+        
+        /********************** INICIA PANTALLA ****************************/
+        Ext.define('donantes.cancelarDonativo', {
+                extend: 'Ext.window.Window',                    
+                alias:'widget.cancelarDonativo',                   
+                title: 'Cancelar Donativo',
+                constrain : true,
+                model: true,
+                width: 430,                
+                height: 180,
+                border: false,
+                buttonAlign: 'left',
+                closeAction:'close',
+                autoDestroy:true,
+                maximizable: true,
+                layout: 'fit',                    
+                region:'center',
+                initComponent: function() {
+                idDonativoCD = this.name;
+                winCancelarDonativo = this;
+//                alert("Donativo: "+idDonativoCD);
+                    
+                var tbarCancelarD = new Ext.Toolbar({ 
+                    items: [
+                        new Ext.Button({
+                            text: 'Guardar',
+                            iconCls: 'icon-save',
+                            handler: function(){                                                                   
+                                var json = winCancelarDonativo.getDatas();
+//                                alert("guardar: "+json);
+//                                alert("ID_DONATIVO: "+idDonativoCD);
+                                if(vCancelaDonativo() != false ){
+                                    Ext.Msg.confirm('Cancelar Donativo', '¿Los datos son correctos?', function(btn, text){
+                                        if (btn == 'yes'){
+                                            //Donativo
+                                            Ext.getCmp('mainFormCancelar').getForm().submit({
+                                                url: 'donativoAC.do?method=cancelarDonativo&jsonData='+json+'&idDonativo='+idDonativoCD+'&idUsuario='+idUsuario,
+                                                waitMsg: 'Guardando...',
+                                                success: function(form, action) {
+                                                    Ext.MessageBox.alert('Cancelado','El donativo se cancelo correctamente');
+                                                    Ext.getCmp('gridDonativos').getStore().load();
+                                                    winCancelarDonativo.destroy();
+                                                    
+                                                },
+                                                failure: function(form, action) {
+                                                    Ext.MessageBox.alert('Error','¡Ocurrio un error al cancelar el donativo!');                                                    
+                                                }
+                                            });                                               
+                                        }
+                                    }); 
+                                }                          
+                            }                                    
+                        }),
+                        '-',                                
+                        new Ext.Button({
+                            text: 'Salir',
+                            iconCls: 'icon-salir',
+                            handler: function(){                                   
+                                winCancelarDonativo.destroy();                            
+                            }   
+                        })
+                    ]
+                }); //termina toolbar uno
+                    
+                    Ext.apply(this, {
+                        items:[
+                            {
+                                xtype: 'form',
+                                id: 'mainFormCancelar',
+                                tbar: tbarCancelarD,
+                                items:[
+                                    Ext.create('Ext.form.ComboBox',{
+                                        fieldLabel: 'Motivo',
+                                        store: storesMotivoCancelacion,                                               
+                                        id: 'ID_MOTIVO_CANCELACION_DONATIVO',
+                                        width:350,
+                                        valueField: 'id',
+                                        displayField: 'nombre',
+                                        typeAhead: true,
+                                        mode: 'local',
+                                        triggerAction: 'all',
+                                        emptyText: '¡Seleccione un motivo!',
+                                        selectOnFocus: true                                               
+                                    }),
+                                    {
+                                        xtype: 'textarea',
+                                        id:'MOTIVO_CANCELACION',
+                                        fieldLabel: 'Comentarios',
+                                        labelWidth: 100,
+                                        width: 400,
+                                        height: 80                                                                                                                                                                           
+                                    }
+                                ] //Cierra items form principal
+                            }
+                        ] //Cierra items Ext.apply
+                    }); //Cierra Ext.apply
+                    donantes.cancelarDonativo.superclass.initComponent.apply(this, arguments); 
+                }, //Cierra initComponent
+                getDatas: function (){//Obtiene cada uno de los valores de los campos necesarios para crear un servicio y no deja guardar si falta alguno
+                    var camposName=['MOTIVO_CANCELACION', 'ID_MOTIVO_CANCELACION_DONATIVO']
+
+                    var camposValue = {'MOTIVO_CANCELACION':'',
+                                'ID_MOTIVO_CANCELACION_DONATIVO':0};                           
+
+                    var pos=0;
+                    var value = '';             
+//                       
+                    for(pos=0;pos<camposName.length;pos++){
+                        value = Ext.getCmp(camposName[pos]).getValue();                        
+                        camposValue[camposName[pos]] = value;                                                                                                                                      
+                    }                                 
+                    return Ext.encode(camposValue);
+                }
+        }); //Cierra Ext.define
+            
+        </script>   
+    </head>
+    <body>
+        <div id="contenedor"></div>
+    </body>
+</html>

@@ -1,0 +1,54 @@
+package com.caritas.action;
+
+import com.caritas.bl.bitacoraPagosBL;
+import com.caritas.bl.confirmacionPagoBL;
+import com.caritas.bl.sinConfirmarBL;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import net.sf.json.JSONObject;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+
+public class sinConfirmarAC extends DispatchAction {
+    private final static String SUCCESS = "success"; 
+    private final static String FAILURE = "failure:";
+    
+    public ActionForward saveSinConfirmar(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        JSONObject data = new JSONObject();
+        JSONObject fInfo = new JSONObject();  
+        sinConfirmarBL sinConf = new sinConfirmarBL();
+        String idUsuario    = "";
+        
+        try {
+            idUsuario = request.getParameter("idUsuario");
+            String jsonData = request.getParameter("jsonData");
+            JSONObject jsonObject = JSONObject.fromObject(jsonData);                   
+            sinConf.saveSinConfirmar(jsonObject, Integer.parseInt(request.getParameter("idBitacora")), idUsuario);        
+            int salida = 1;
+            fInfo.element("salida", salida);
+            data.element("success", "true");
+            data.element("fileinfo", fInfo);            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return mapping.findForward(FAILURE);            
+        }
+        request.setAttribute("resp", data.toString());       
+        return mapping.findForward(SUCCESS);
+    }
+    
+    public ActionForward getComentariosInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String salida = "";
+        int idBitacora = Integer.parseInt(request.getParameter("ID_BITACORA"));
+        sinConfirmarBL sinConf = new sinConfirmarBL();
+        
+        try {                                
+            salida = sinConf.getComentariosInfo(idBitacora);         
+            request.setAttribute("resp", salida);
+        } catch (Exception e) {
+        }
+        return mapping.findForward(SUCCESS);
+    }
+     
+}

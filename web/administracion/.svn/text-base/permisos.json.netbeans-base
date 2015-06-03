@@ -1,0 +1,66 @@
+/* 
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+[{
+    "text": "Operacion", 
+    "cls": "folder",
+    "expanded": true,
+    "children": [{
+        "id": 101,
+        "text": "Registro",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 102,
+        "text": "Estudio Socioeconomico",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 103,
+        "text": "Expediente",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 104,
+        "text": "Citas",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 105,
+        "text": "Servicios",
+        "leaf": true,
+        "checked": false
+    }]
+},{
+    "text": "Egresos",
+    "cls": "folder",
+    "expanded": true,
+    "children": [{
+        "id": 201,
+        "text": "Solicitud de Cheques",
+        "leaf": true,
+        "checked": false
+    }]
+},{
+    "text": "Administración", 
+    "cls": "folder",
+    "expanded": true,
+    "children": [{
+        "id": 301,
+        "text": "Catalogos",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 302,
+        "text": "Servicios",
+        "leaf": true,
+        "checked": false
+    },{
+        "id": 303,
+        "text": "Mantenimiento",
+        "leaf": true,
+        "checked": false
+    }]
+}]

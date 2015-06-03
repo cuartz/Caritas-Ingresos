@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listadoCobranza_Te" pageWidth="354" pageHeight="612" columnWidth="314" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="3.4522712143931047"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="68"/>
+	<subDataset name="New Dataset 1"/>
+	<parameter name="FECHAINICIAL" class="java.lang.String"/>
+	<parameter name="FECHAFINAL" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT  
+   ROW_NUMBER()OVER (ORDER BY BITA.FECHA_PAGO ASC) AS ROWNUMBER,
+   BITA.ID_RECIBO, 
+   DONANTE.ID_DONANTE,
+  --CONVERT( VARCHAR(20),DONANTE.ID_DONANTE) + ' - ' + DONANTE.NOMBRE + ' ' + DONANTE.A_PATERNO + ' ' + DONANTE.A_MATERNO AS NOMBRE_DONANTE,
+   BITA.IMPORTE,
+   CAST(BITA.ID_NUM_PAGO AS VARCHAR(10)) + ' de ' +CAST(DONATIVO.NUM_FRECUENCIA AS VARCHAR(10)) AS NUM_FRECUENCIA,
+   CONVERT(VARCHAR(20),BITA.FECHA_PAGO,103) AS FECHA_PAGO, 
+   CV2.NOMBRE AS FORMA_PAGO,
+   ISNULL((CASE 
+    WHEN (CV4.CUENTA_55 = 1) THEN 'CUENTA 55'
+    WHEN (CV4.OTRAS_CUENTAS IS NOT NULL) THEN 'OTRAS CUENTAS'
+    WHEN (CV4.DEPOSITO_SORTEOS = 1) THEN 'DEPOSITOS SORTEOS'
+    WHEN (DONATIVO.ID_FORMA_PAGO = 2684) THEN CV6.NOMBRE  
+   END), 'NA') AS CUENTA,   
+   CV1.NOMBRE AS PROYECTO,
+   CV3.NOMBRE AS ASIGNACION,
+   CONVERT (VARCHAR, CURRENT_TIMESTAMP, 106) fecha_actual
+  FROM DB_INGRESOS.dbo.OPE_BITACORA_PAGOS_DONATIVOS BITA
+  INNER JOIN DB_INGRESOS.dbo.OPE_DONATIVOS_DONANTE DONATIVO ON BITA.ID_DONATIVO = DONATIVO.ID_DONATIVO
+  INNER JOIN DB_INGRESOS.dbo.OPE_DONANTES DONANTE ON DONATIVO.ID_DONANTE = DONANTE.ID_DONANTE
+  LEFT JOIN DB_INGRESOS.dbo.OPE_DIRECCIONES_DONANTE DIR ON (DONATIVO.ID_DONANTE = DIR.ID_DONANTE) AND (DIR.ID_TIPO_DIRECCION = 2389)
+  LEFT JOIN DB_INGRESOS.dbo.OPE_RECOLECTORES REC ON DIR.ID_RECOLECTOR = REC.ID_RECOLECTOR
+  INNER JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES CV1 ON DONATIVO.ID_CAMPANA_FINANCIERA = CV1.ID
+  INNER JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES CV2 ON DONATIVO.ID_FORMA_PAGO = CV2.ID
+  INNER JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES CV3 ON DONATIVO.ID_ASIGNACION = CV3.ID
+  LEFT JOIN DB_INGRESOS.dbo.OPE_DATOS_DEPOSITO CV4 ON DONATIVO.ID_DONATIVO = CV4.ID_DONATIVO
+  LEFT JOIN DB_INGRESOS.dbo.OPE_DATOS_TRANSFERENCIA CV5 ON DONATIVO.ID_DONATIVO = CV5.ID_DONATIVO
+  LEFT JOIN BD_ADMIN.dbo.ADM_CATALOGS_VALUES CV6 ON CV5.TRANSFERENCIA = CV6.ID 
+  WHERE (BITA.FECHA_PAGO >= $P{FECHAINICIAL} AND BITA.FECHA_PAGO <=$P{FECHAFINAL} ) 
+ ORDER BY BITA.FECHA_PAGO]]>
+	</queryString>
+	<field name="ROWNUMBER" class="java.lang.Long"/>
+	<field name="ID_RECIBO" class="java.lang.String"/>
+	<field name="ID_DONANTE" class="java.math.BigDecimal"/>
+	<field name="IMPORTE" class="java.lang.Double"/>
+	<field name="NUM_FRECUENCIA" class="java.lang.String"/>
+	<field name="FECHA_PAGO" class="java.lang.String"/>
+	<field name="FORMA_PAGO" class="java.lang.String"/>
+	<field name="CUENTA" class="java.lang.String"/>
+	<field name="PROYECTO" class="java.lang.String"/>
+	<field name="ASIGNACION" class="java.lang.String"/>
+	<field name="fecha_actual" class="java.lang.String"/>
+	<variable name="APOYO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="DONATIVO_VALUE" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="39" y="23" width="207" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CÁRITAS DE MONTERREY A.B.P.
+                ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="246" y="3" width="65" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fecha_actual}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="30" width="39" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Recibo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="30" width="30" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="30" width="38" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Donante]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="190" y="30" width="55" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Proyecto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="112" y="30" width="30" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Frecuencia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="146" y="30" width="41" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[F. Pago]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="249" y="30" width="65" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Asignacion]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17">
+			<textField>
+				<reportElement x="0" y="0" width="39" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_RECIBO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="0" width="30" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IMPORTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="112" y="0" width="30" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_FRECUENCIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="0" width="38" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_DONANTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="190" y="0" width="55" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROYECTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="146" y="0" width="41" height="17"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FECHA_PAGO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="249" y="0" width="65" height="16"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASIGNACION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

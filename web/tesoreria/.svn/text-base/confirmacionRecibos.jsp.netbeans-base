@@ -1,0 +1,118 @@
+<%--
+    Document   : Confirmacion Recibos
+    Created on : 10/04/2012, 14:14:12 pm
+    Author     : Ozamora
+--%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page language="java" %>
+<%@page import="org.apache.struts.Globals" %>
+<%@page import="java.util.Locale" %>
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%//Obtenemos los datos de la cita programanda
+           /*
+     * HttpSession sesion = request.getSession(); Person infoUser = (Person)
+     * sesion.getAttribute("infoSesion"); if (infoUser == null) { infoUser = new
+     * Person(); }
+     */
+%>
+<html>
+    <head>
+        <!-- LIBRERIAS PARA ExtJS-->
+        <!--        <link rel="stylesheet" type="text/css" href="css/estilo.css" />-->
+        <script type="text/javascript">
+   
+            
+                     
+            //Inicia
+            //Creation Screen            
+            Ext.define('tesoreria.confirmacionRecibos', {
+                extend: 'Ext.window.Window',
+                id:'confirmacionRecibos',
+                alias:'widget.confirmacionRecibos',                
+                title: 'Confirmacion Recibos',
+                width: 450,                
+                height: 200,
+                border: false,
+                buttonAlign: 'left',
+                layout: 'fit',
+                maximizable: true,
+                closeAction : 'close',
+                region:'center',
+                initComponent: function() {
+                    Ext.apply(this, {
+                        items: [
+                            {
+                                xtype: 'panel',
+                                border: false,
+                                items: [
+                                    {
+                                        xtype: 'panel',
+                                        border: false,
+                                        items: [
+                                            {
+                                                xtype: 'checkboxgroup',
+                                                width: 400,
+                                                fieldLabel: 'Entregado',
+                                                items: [
+                                                    {
+                                                        xtype: 'checkboxfield',
+                                                        boxLabel: 'Si'
+                                                    },
+                                                    {
+                                                        xtype: 'checkboxfield',
+                                                        boxLabel: 'No'
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        xtype: 'panel',
+                                        border: false,
+                                        items: [
+                                            {
+                                                xtype: 'textareafield',
+                                                width: 382,
+                                                fieldLabel: 'Motivo'
+                                            }
+                                        ]
+                                    }
+                                ],
+                                dockedItems: [
+                                    {
+                                        xtype: 'toolbar',
+                                        dock: 'top',
+                                        items: [
+                                            {
+                                                xtype: 'button',
+                                                text: 'Guardar',
+                                                iconCls:'icon-save'
+                                            }
+                                            ,
+                                            {xtype:'tbseparator'},
+                                            {
+                                                xtype: 'button',
+                                                text: 'Cancelar',
+                                                iconCls:'icon-cancelar',
+                                                handler: function()
+                                                {
+                                                    var win=Ext.getCmp('confirmacionRecibos');
+                                                    win.close();
+                                                }  
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+                    tesoreria.confirmacionRecibos.superclass.initComponent.apply(this, arguments); 
+                }
+            });
+   
+
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
